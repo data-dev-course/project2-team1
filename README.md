@@ -1,6 +1,7 @@
 # devcourse-strayanimal-stat
 
-npm start to start server
-to see front react, cd strayanimal and npm start
+`npm start` to run server
 
-add
+`npm run dev` to run server with nodemon
+
+`npm run build` to make a react build
