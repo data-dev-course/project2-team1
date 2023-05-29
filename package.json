@@ -1,0 +1,38 @@
+{
+  "name": "devcourse-strayanimal-stat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "init.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node init.js",
+    "serve": "nodemon init.js",
+    "build:server": "babel src -d build",
+    "dev:server": "nodemon",
+    "dev:assets": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=development -w",
+    "babel-node": "babel-node --presets='@babel/preset-env' --ignore='foo|bar|baz'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-flash": "^0.0.2",
+    "express-session": "^1.17.3",
+    "firebase": "^9.22.1",
+    "morgan": "^1.10.0",
+    "node-fetch": "^3.3.1",
+    "nodemon": "^2.0.22",
+    "regenerator-runtime": "^0.13.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.1",
+    "@babel/preset-env": "^7.22.2",
+    "@babel/preset-react": "^7.22.3",
+    "@babel/register": "^7.21.0",
+    "babel-loader": "^9.1.2"
+  },
+  "type": "module"
+}
