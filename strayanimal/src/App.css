@@ -1,9 +1,11 @@
+@import "util.css";
 .App {
   text-align: center;
+  align-items: center;
 }
 
 .App-logo {
-  height: 40vmin;
+  height: 80px;
   pointer-events: none;
 }
 
@@ -14,25 +16,68 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  height: 80px;
   color: white;
+  width: 100%;
+  max-width: 1320px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.App-link {
-  color: #61dafb;
+.intro {
+  height: 80vh;
+  justify-content: center;
+  align-items: center;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.app-navibar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  font-weight: 500;
+}
+
+.intro-typography {
+  font-family: forte;
+  font-size: 7.5rem;
+  line-height: 7.75rem;
+  color:#FF5F15;
+}
+
+.intro-orange-line {
+  position: absolute;
+  height: 10px;
+  width: clamp(10vw, 35vw, 35%);
+  border: none;
+  background-color: #FF5F15;
+  border-radius: 40px;
+}
+
+button, input[type="submit"], input[type="reset"] {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}
+
+.bounce2 {
+  animation: bounce2 2s ease infinite;
+}
+
+@keyframes bounce2 {
+	0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+	40% {transform: translateY(-30px);}
+	60% {transform: translateY(-15px);}
+}
+
+@media (max-width: 480px) {
+  .intro-typography {
+    font-size: 4.5rem;
+    line-height: 4.75rem;
   }
-  to {
-    transform: rotate(360deg);
+  .intro-subtitle {
+    font-size: 1rem;
   }
 }
