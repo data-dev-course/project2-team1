@@ -4,12 +4,10 @@
   "description": "",
   "main": "init.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node init.js",
-    "serve": "nodemon init.js",
-    "build:server": "babel src -d build",
-    "dev:server": "nodemon",
-    "dev:assets": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=development -w",
+    "dev": "nodemon init.js",
+    "build": "cd strayanimal && npm run build",
+    "test": "jest",
     "babel-node": "babel-node --presets='@babel/preset-env' --ignore='foo|bar|baz'"
   },
   "keywords": [],
