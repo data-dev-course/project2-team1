@@ -40,7 +40,7 @@ def get_existing_data(project_id, dataset_id, table_id):
     """
     bigquery_client = bigquery.Client()
     table_ref = bigquery_client.dataset(dataset_id, project=project_id).table(table_id)
-    table = bigquery_client.get_table(table_ref)
+    # table = bigquery_client.get_table(table_ref)
     query = f"""
     SELECT *
     FROM (
@@ -54,7 +54,7 @@ def get_existing_data(project_id, dataset_id, table_id):
     existing_data = {row.desertionNo: row.processState for row in results}
     return existing_data
 
-def insert_changed_data(project_id, dataset_id, table_id, changed_data):
+def insert_changed_data(project_id, dataset_id, table_id, data):
     """
     변경된 데이터를 BigQuery에 삽입합니다.
     
@@ -62,12 +62,12 @@ def insert_changed_data(project_id, dataset_id, table_id, changed_data):
         project_id (str): 프로젝트 ID
         dataset_id (str): 데이터셋 ID
         table_id (str): 테이블 ID
-        changed_data (pd.DataFrame): 변경된 데이터가 담긴 데이터프레임
+        data (pd.DataFrame): 변경된 데이터가 담긴 데이터프레임
     """
     bigquery_client = bigquery.Client()
-    if len(changed_data) > 0:
+    if len(data) > 0:
         values = []
-        for _, row in changed_data.iterrows():
+        for _, row in data.iterrows():
             values.append("({}, '{}', DATE '{}')".format(row.desertionNo, row.processState, datetime.strptime(str(row.happenDt), '%Y%m%d').strftime('%Y-%m-%d')))
         insert_query = """
         INSERT INTO {}.{} ({}, {}, {})
@@ -77,8 +77,8 @@ def insert_changed_data(project_id, dataset_id, table_id, changed_data):
         job_config.use_legacy_sql = False
         query_job = bigquery_client.query(insert_query, job_config=job_config)
         query_job.result()
-        print(f"변경된 레코드 수: {len(changed_data)}")
-        print(changed_data)
+        print(f"변경된 레코드 수: {len(data)}")
+        print(data)
         
         print("데이터 삽입 완료.")
     else:
@@ -98,13 +98,16 @@ def process_data(bucket_name, file_name, project_id, dataset_id, table_id):
     df = read_data_from_storage(bucket_name, file_name)
     existing_data = get_existing_data(project_id, dataset_id, table_id)
     changed_data = df[df['desertionNo'].map(existing_data) != df['processState']]
+    new_data = df[~df['desertionNo'].isin(existing_data.keys())]
+    
     insert_changed_data(project_id, dataset_id, table_id, changed_data)
+    insert_changed_data(project_id, dataset_id, table_id, new_data)
 
 
 def main():
     before_one_day = (datetime.now() - relativedelta(days=1)).strftime("%Y%m%d")
     bucket_name = 'strayanimal-bucket'
-    file_name = f"raw-data/strayanimal_data_{before_one_day}.csv"
+    file_name = f"raw-data/strayanimal-datas/strayanimal_data_{before_one_day}.csv"
     project_id = 'strayanimal'
     dataset_id = 'raw_data'
     table_id = 'animal_status'
