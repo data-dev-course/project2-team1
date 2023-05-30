@@ -12,7 +12,7 @@ import os
 
 # Google Cloud Storage와 BigQuery 인증 정보 설정
 # path에는 GCP 에서 할당받은 Serice Key가 필요 
-path = "{INPUT YOUR SERVICE KEY}"
+path = "./strayanimal-61531c578dbe.json"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=path
 
 before_one_day = (datetime.now() - relativedelta(days=1)).strftime("%Y%m%d")
@@ -47,13 +47,10 @@ def update_bigquery(bucket_name, file_name):
 
     
     
-    
     if load_job.state == 'DONE':
         print(f"Updated BigQuery table {table_id} with data from {file_path}")
     else:
         print(f"Failed to update BigQuery table {table_id} with data from {file_path}")
-
-
 
 
 
@@ -62,11 +59,9 @@ def check_update():
     # 버킷 이름과 파일 이름 지정 ( 매일 전 날짜의 csv를 읽어와 업데이트 )
     bucket_name = 'strayanimal-bucket'
     file_name = f"raw-data/strayanimal_data_{before_one_day}.csv"
-    
-    
-    
     update_bigquery(bucket_name, file_name)
-
+    
+    
 
 
 def main() :
@@ -74,3 +69,4 @@ def main() :
 
 if __name__ == "__main__":
     main()
+    
