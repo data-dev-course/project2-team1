@@ -1,4 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Fugaz+One&family=Shrikhand&display=swap');
+
+a, u {
+    text-decoration: none;
+    color:#FFf;
+}
+
 /*util class*/
 .horizontal {
     display: -webkit-box;
