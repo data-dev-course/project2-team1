@@ -23,12 +23,11 @@ app.use(flash());
 app.use(cors());
 app.use("/uploads", express.static("uploads"));
 app.use("/static", express.static("assets"));
-
 const handleListening = () =>
   console.log(`✅ Server listenting on http://localhost:${PORT} 🚀`);
 
 app.listen(PORT, handleListening);
-
+//Routes
 app.use(express.static(path.join(__dirname, 'strayanimal/build')));
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, '/strayanimal/build/index.html'));
