@@ -1,0 +1,65 @@
+@import "util.css";
+.intro {
+    height: 80vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.intro-typography {
+    font-family: 'Carter One', cursive;
+    font-size: 7.5rem;
+    line-height: 8.125rem;
+    color:#FF5F15;
+}
+
+.intro-orange-line {
+    position: absolute;
+    height: 10px;
+    width: clamp(10vw, 33vmin, 30%);
+    border: none;
+    background-color: #FF5F15;
+    border-radius: 40px;
+}
+.intro-subtitle {
+    color:#fff;
+    padding: 20px 0;
+    font-size: 1.25rem;
+    font-weight:400;
+}
+
+  button, input[type="submit"], input[type="reset"] {
+      background: none;
+      color: inherit;
+      border: none;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+      outline: inherit;
+  }
+  
+  .bounce2 {
+    animation: bounce2 2s ease infinite;
+  }
+  
+  @keyframes bounce2 {
+      0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+      40% {transform: translateY(-30px);}
+      60% {transform: translateY(-15px);}
+  }
+  
+@media (max-width: 1080px) {
+    .intro-typography {
+        font-size: 6rem;
+        line-height: 6.75rem;
+    }
+    .intro-subtitle {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro-typography {
+        font-size: 4rem;
+        line-height: 4.5rem;
+    }
+}
