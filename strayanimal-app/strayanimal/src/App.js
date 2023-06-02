@@ -16,6 +16,18 @@ function App() {
         </div>
       </header>
       <Outlet/>
+      <footer className='App-footer'>
+        <div className='footer-wrap' style={{padding: "0 20px"}}>
+        <div className='footer-title'>Animal STAT-US Tracker</div>
+        <div style={{fontWeight:600}}>DevCourse Data Engineering</div>
+        <div style={{color:"#F5F5F5"}}>Data Warehouse & Dashboard Construct Project</div>
+        <div style={{height: "10px", width: "100%"}}></div>
+        <div>강다혜 @kangdaia</div>
+        <div>박태준 @ih-tjpark</div>
+        <div>전성현 @Jeon-peng</div>
+        <div>최민수 @usiohc</div>
+        </div>
+      </footer>
     </div>
   );
 }

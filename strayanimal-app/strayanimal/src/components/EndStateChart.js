@@ -1,13 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-//import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import Chart from 'chart.js/auto';
-//import { Doughnut } from "react-chartjs-2";
 import { useQuery} from "@tanstack/react-query";
 import db from '../firebase.js';
 import { collection, getDocs, query, where, documentId } from "firebase/firestore";
 import Loading from "./Loading.js";
-
-//ChartJS.register(ArcElement, Tooltip, Legend);
+import "../css/Overview.css";
 
 function EndStateChart(params) {
     const chartRef = useRef(null);
@@ -16,9 +13,8 @@ function EndStateChart(params) {
         let low60Day = dataset.filter(d => d.lt60Day === 1)
         let above60Day = dataset.filter(d => d.lt60Day === 0)
         const lt60DayDataset = [
-            low60Day.reduce((partialSum, a) => partialSum + parseFloat(a.percentage), 0.0),
-            above60Day.reduce((partialSum, a) => partialSum + parseFloat(a.percentage), 0.0)
-        ]
+            low60Day.reduce((partialSum, a) => partialSum + parseFloat(a.percentage), 0.0), 
+            above60Day.reduce((partialSum, a) => partialSum + parseFloat(a.percentage), 0.0)]
         const subDatasetlt60Day = [...low60Day, ...above60Day]
         const backgroundColor = [
             'rgba(255, 99, 132, 1)',
@@ -28,35 +24,45 @@ function EndStateChart(params) {
             'rgba(153, 102, 255, 1)',
             'rgba(255, 159, 64, 1)',
             ];
+        const datalabels = dataset.map((elem)=> elem.endState)
         return ({
             type: 'doughnut',
             data: {
-                labels: dataset.map((elem)=> elem.lt60Day+":"+elem.endState),
+                
                 datasets: [{
+                    label: '종료상태',
                     data: subDatasetlt60Day.map((elem) => parseFloat(elem.percentage)),
                     backgroundColor: backgroundColor,
-                    labels: dataset.map((elem)=> elem.endState)
+                    spacing: 10,
+                    labels: datalabels,
+                    borderWidth: 3,
+                    hoverOffset: 5,
                 },
                 {
+                    label: "60일 기준",
                     data: lt60DayDataset,
-                    backgroundColor: ["#FF5F15","#00B3A0"],
-                    borderColor: ["#FF5F15","#00B3A0"],
                     labels: ["60일 미만", "60일 이상"],
+                    backgroundColor: ["#F7464A","#00B3A0"],
+                    borderColor: ["#F7464A","#00B3A0"],
+                    weight: 1.3,
+                    borderWidth: 1,
+                    hoverOffset: 2,
                 },]
             },
             options: {
                 responsive: true,
-                legend: {
-                    display: false,
-                },
-                tooltips: {
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            var dataset = data.datasets[tooltipItem.datasetIndex];
-                            var index = tooltipItem.index;
-                            return dataset.labels[index] + ': ' + dataset.data[index];
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var index = context.dataIndex;
+                                return context.dataset.labels[index] + ': ' + context.dataset.data[index];
+                            }
                         }
-                    }
+                    },    
                 }
             }
         });
@@ -106,11 +112,17 @@ function EndStateChart(params) {
     });
     useEffect(() => {
         if (status === "success") {
-            console.log(data[0], data[1]);
-            if (params.type === "all") {
+            const percent_kind = [
+                {"endState": "개", "count": data[2].filter(data => data.kindCd === "개").reduce((sum, a) => sum+parseInt(a.count), 0)},
+                {"endState": "고양이", "count":data[2].filter(data => data.kindCd === "고양이").reduce((sum, a) => sum+parseInt(a.count), 0)},
+                {"endState": "기타축종", "count":data[2].filter(data => data.kindCd === "기타축종").reduce((sum, a) => sum+parseInt(a.count), 0)}
+            ]
+            if (params.type === "전체") {
                 setDoughnutData(dataconfig(data[0]))
-            } else if (params.type === "60days") {
+            } else if (params.type === "60일 기준") {
                 setDoughnutData(lt60dayChart(data[1]))
+            } else if (params.type === "전체 축종") {
+                setDoughnutData(dataconfig(percent_kind))
             } else if (params.type === "개") {
                 setDoughnutData(dataconfig(data[2].filter(data => data.kindCd === "개")))
             } else if (params.type === "고양이") {
@@ -121,6 +133,7 @@ function EndStateChart(params) {
         }
         
     }, [status, params.type])
+
     useEffect(() => {
         if (status === "success" && doughnutData != null) {
             let chartStatus = Chart.getChart(params.type)
@@ -131,11 +144,11 @@ function EndStateChart(params) {
             new Chart(ctx, doughnutData);
         }
     }, [doughnutData, status])
+
     if (status === "loading" || doughnutData === null) {
         return <Loading/>
     }
     return <div><canvas id={params.type} ref={chartRef}/></div>
-    //return <Doughnut data={doughnutData} />
 }
 
 export default EndStateChart;
