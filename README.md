@@ -30,8 +30,8 @@
 icon 전환 예정
 | Field | Stack |
 |:---:|:---|
-| 프론트엔드 | <img src = "https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black"> <img src = "https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB">, <img src = "https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white"> , <img src = "https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white"> |
-| 백엔드 | <img src = "https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black"> |
+| 프론트엔드 | <img src = "https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB">, <img src = "https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white"> , <img src = "https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white"> |
+| 호스팅 & GL | <img src = "https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black"> |
 | 데이터 관리 | Google Cloud Storage, Bigquery, FireStore |
 | Dashboard | Superset |
 | Scheduling | Crontab, 예약된 쿼리, Cloud Pub/Sub , Cloud Function |
