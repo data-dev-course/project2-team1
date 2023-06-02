@@ -42,7 +42,7 @@ icon 전환 예정
 
 
 ## 데이터 흐름
-![image](https://github.com/data-dev-course/project2-team1/assets/70497132/4c12068c-3cff-4430-8070-c07ef0bab582)
+![image](https://github.com/data-dev-course/project2-team1/assets/70497132/7f18790d-85db-4f48-b3dc-0b74cfdd7546)
 
 
 ## 전체 파이프라인
