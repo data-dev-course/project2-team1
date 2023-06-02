@@ -6,7 +6,7 @@ import io
 import os
 import pandas as pd
 
-path = "./strayanimal-61531c578dbe.json"
+path = "/home/ubuntu/openAPI/updater/strayanimal-61531c578dbe.json"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=path
 
 def read_data_from_storage(bucket_name, file_name):
@@ -26,6 +26,8 @@ def read_data_from_storage(bucket_name, file_name):
     df = pd.read_csv(io.StringIO('\n'.join(csv_data)))[['desertionNo','processState','happenDt']]
     return df
 
+
+
 def get_existing_data(project_id, dataset_id, table_id):
     """
     BigQuery에서 기존 데이터를 가져옵니다.
@@ -39,8 +41,7 @@ def get_existing_data(project_id, dataset_id, table_id):
         dict: desertionNo를 키로, processState를 값으로 하는 기존 데이터의 딕셔너리
     """
     bigquery_client = bigquery.Client()
-    table_ref = bigquery_client.dataset(dataset_id, project=project_id).table(table_id)
-    # table = bigquery_client.get_table(table_ref)
+    
     query = f"""
     SELECT *
     FROM (
@@ -77,12 +78,10 @@ def insert_changed_data(project_id, dataset_id, table_id, data):
         job_config.use_legacy_sql = False
         query_job = bigquery_client.query(insert_query, job_config=job_config)
         query_job.result()
-        print(f"변경된 레코드 수: {len(data)}")
-        print(data)
-        
-        print("데이터 삽입 완료.")
+        print(f"Number of modified records: {len(data)}")
+        print("Data insertion complete.")
     else:
-        print("변경된 데이터 없음.")
+        print("There is no data to update.")
         
 def process_data(bucket_name, file_name, project_id, dataset_id, table_id):
     """
@@ -96,12 +95,26 @@ def process_data(bucket_name, file_name, project_id, dataset_id, table_id):
         table_id (str): 테이블 ID
     """
     df = read_data_from_storage(bucket_name, file_name)
-    existing_data = get_existing_data(project_id, dataset_id, table_id)
-    changed_data = df[df['desertionNo'].map(existing_data) != df['processState']]
-    new_data = df[~df['desertionNo'].isin(existing_data.keys())]
     
-    insert_changed_data(project_id, dataset_id, table_id, changed_data)
-    insert_changed_data(project_id, dataset_id, table_id, new_data)
+    existing_data = get_existing_data(project_id, dataset_id, table_id)
+    # changed_data = df[df['desertionNo'].map(existing_data) != df['processState']]
+    # new_data = df[~df['desertionNo'].isin(existing_data.keys())]
+    new_data = df[~df['desertionNo'].isin(existing_data.keys())].copy()
+    changed_data = df[df['desertionNo'].isin(existing_data.keys()) & (df['processState'] != df['desertionNo'].map(existing_data))].copy()
+    
+    
+    
+    print(f'changed_data  : {len(changed_data)}, new_data : {len(new_data)}')
+    result_data = pd.concat([changed_data, new_data], ignore_index=True)
+    result_data['happenDt'] = int(datetime.today().strftime('%Y%m%d'))
+
+    insert_changed_data(project_id, dataset_id, table_id, result_data)
+    
+    
+    
+    
+    print(f"Number of rows in the {file_name} file: {len(df)}")    
+    
 
 
 def main():
@@ -111,9 +124,15 @@ def main():
     project_id = 'strayanimal'
     dataset_id = 'raw_data'
     table_id = 'animal_status'
-
+    print('ㅡ' * 20)
+    print("Start animal_status_bugquery_update")
     process_data(bucket_name, file_name, project_id, dataset_id, table_id)
-
+    print("End animal_status_bugquery_update",datetime.now())
+    
+    
+    
+    print('ㅡ' * 20)
+    
 if __name__ == '__main__':
     main()
     
