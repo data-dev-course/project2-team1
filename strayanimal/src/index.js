@@ -11,7 +11,6 @@ import  { QueryClient,
 } from '@tanstack/react-query'
 import reportWebVitals from './reportWebVitals';
 import Intro from './components/Intro';
-import { storageDataLoader } from './loaders/filedataLoader';
 
 const queryClient = new QueryClient()
 /** react-router-dom setting*/
@@ -20,7 +19,6 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     errorElement: <div>Not Found</div>,
-    loader: storageDataLoader,
     children: [
       { index: true, element: <Intro /> },
       {
