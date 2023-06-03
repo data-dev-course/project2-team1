@@ -34,8 +34,12 @@ icon 전환 예정
 2. 유기동물 보호종료 현황 대시보드
 ![유기동물-보호종료-상태-2023-06-02T13-11-50 958Z](https://github.com/data-dev-course/project2-team1/assets/70497132/ea85cf23-01b6-4f09-81bc-ca21e363aa26)
 
+## 시연
+### 1.인포그래픽을 위한 웹 호스팅
+https://github.com/data-dev-course/project2-team1/assets/70497132/513aaee9-5325-4d1a-9842-5529af6ca8fc
 
-
+### 2. 데이터 상태 분석을 위한 대시보드 구축
+https://github.com/data-dev-course/project2-team1/assets/70497132/6a756bbd-91d0-448a-b116-fdfd3722e3b4
 
 
 
