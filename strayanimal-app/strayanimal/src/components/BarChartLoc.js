@@ -29,9 +29,7 @@ function BarChartLoc() {
                     label: type,
                 })
             });
-            console.log(datasets)
             let chartStatus = Chart.getChart("bar_chart_loc_state")
-            console.log(endStateList)
             if(chartStatus !== undefined) {
                 chartStatus.destroy()
             }

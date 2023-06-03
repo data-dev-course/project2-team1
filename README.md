@@ -1,4 +1,4 @@
-# Animal Stat-us Tracker
+# Animal STAT-US Tracker
 ## **유기동물 조회 API를 이용한 보호소 및 계류상태 분석**
 - 프로젝트 기간 : 2023.05.29 ~ 2023.06.02
 - 유기된 동물의 데이터를 주기적 크롤링, ETL를 통하여 생성한 데이터를 GoogleCloudStorage, GoogleBigquery를 활용하여 적재
@@ -15,7 +15,7 @@
 icon 전환 예정
 | Field | Stack |
 |:---:|:---|
-| 프론트엔드 | <img src = "https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"> <img src = "https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white"> <img src = "https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white"> |
+| 프론트엔드 | <img src = "https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB">, <img src = "https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white"> , <img src = "https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white"> |
 | 호스팅 & GA | <img src = "https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black"> |
 | 데이터 관리 | Google Cloud Storage, Bigquery, FireStore |
 | Dashboard | Superset |
