@@ -22,22 +22,17 @@
 
 ![프로젝트2-3팀-1조 (1)](https://github.com/data-dev-course/project2-team1/assets/57780594/c1b1f7a9-ee31-41a5-9575-7cc771acb0ac)
 1. publisher(게시자)
-  - publisher는 message를 생성한 뒤에, topic에 담아두도록 전달해주는 서버
+<br> &nbsp;- publisher는 message를 생성한 뒤에, topic에 담아두도록 전달해주는 서버
 2. message(메세지)
-  - message는 publisher로 부터 subscriber에게 최종적으로 전달되는 데이터와 property의 조합 (Api끼리 통신을 할 데이터라고 할 수 있음)
+<br> &nbsp;- message는 publisher로 부터 subscriber에게 최종적으로 전달되는 데이터와 property의 조합 (Api끼리 통신을 할 데이터라고 할 수 있음)
 3. topic(주제)
-  - topic은 task, 즉 업무이며 publisher가 message를 전달하는 리소스
+<br> &nbsp;- topic은 task, 즉 업무이며 publisher가 message를 전달하는 리소스
 4. subscription(구독)
-  - subscription은 message스트림이 subscriber들에게 전달되는 과정을 나타내는 이름을 가지고 있는 리소스 
+<br> &nbsp;- subscription은 message스트림이 subscriber들에게 전달되는 과정을 나타내는 이름을 가지고 있는 리소스 
 5. subscriber(구독자)
-  - subscriber는 message를 수신하려는 서버
+<br> &nbsp;- subscriber는 message를 수신하려는 서버
 
 <br>
 
 ## 3. BigQuery - Pub/Sub - Cloud Function 구성방법
-1. 주제(topic) 생성
-![스크린샷 2023-06-03 오전 2 27 29](https://github.com/data-dev-course/project2-team1/assets/57780594/f1c6924c-92eb-43cd-a6ce-a79fe56c776d)
-2. 구독 생성
-3. BigQuery에 예약된 쿼리 설정 하단 '알림 옵션'에 구독 경로 입력
-4. 주제 선택 후 CLUOUD 함수 트리거 선택 후 작성 (작성 시 리전 맞춰줘야함)
-5.
+
