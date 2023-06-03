@@ -54,7 +54,6 @@ function TreeMapKind() {
             if(chartStatus !== undefined) {
                 chartStatus.destroy()
             }
-            console.log(data[0],datasets);
             const ctx = chartRef.current.getContext('2d');
             window.mybarchart = new Chart(ctx, {
               type: 'treemap',
