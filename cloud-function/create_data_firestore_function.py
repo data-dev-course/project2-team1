@@ -156,7 +156,7 @@ def create_document():
     db = firestore.Client()
     
     if "차트12" in file_name :
-      parent_doc_ref = db.collection('test_collection').document("차트12_유기동물_detail")
+      parent_doc_ref = db.collection('strayanimal').document("차트12_유기동물_detail")
       n=0
       # 분할한 데이터를 서브 컬렉션에 저장
       for i in range(0, len(json_data), div_list_size):
@@ -166,7 +166,7 @@ def create_document():
         subcollaction_ref.set({"data":filed_data})
         n += 1
     else:
-      db.collection('test_collection').document(file_name).set({"data":json_data})
+      db.collection('strayanimal').document(file_name).set({"data":json_data})
   
     print("document 생성 완료 : "+ file_name)
     
