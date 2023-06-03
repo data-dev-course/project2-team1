@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import numpy as np
 
-path = "/home/ubuntu/openAPI/updater/strayanimal-61531c578dbe.json"
+path = "본인의 KEY"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=path
 before_one_day = (datetime.now() - relativedelta(days=1)).strftime("%Y%m%d")
 bucket_name = 'strayanimal-bucket'
