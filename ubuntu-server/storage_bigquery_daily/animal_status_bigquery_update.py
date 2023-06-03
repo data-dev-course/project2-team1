@@ -6,7 +6,7 @@ import io
 import os
 import pandas as pd
 
-path = "/home/ubuntu/openAPI/updater/strayanimal-61531c578dbe.json"
+path = "본인의 KEY"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=path
 
 def read_data_from_storage(bucket_name, file_name):
