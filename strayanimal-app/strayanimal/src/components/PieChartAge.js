@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Chart from 'chart.js/auto';
 import { useQuery} from "@tanstack/react-query";
 import db from '../firebase.js';
@@ -53,7 +53,7 @@ function PieChartAge(params) {
     if (status === "loading") {
         return <Loading/>
     }
-    return <div style={{maxWidth: "500px"}}><canvas id="pie_chart_per_age" ref={chartRef}/></div>
+    return <div className="horizontal align-center" style={{width: "100%"}}><canvas id="pie_chart_per_age" ref={chartRef}/></div>
 }
 
 export default PieChartAge;
