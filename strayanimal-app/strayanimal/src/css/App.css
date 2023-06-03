@@ -22,8 +22,37 @@
   height: 80px;
   color: white;
   width: 100%;
-  max-width: 1320px;
+  max-width: 1280px;
   justify-content: space-between;
   align-items: center;
 }
 
+.App-footer {
+  height: fit-content;
+  min-height: 200px;
+  background-color:#3D3D3D;
+  color:#fff;
+  width: 100%;
+  max-width: 1280px;
+  align-items: flex-start;
+  box-shadow: 0 0 0 100vmax #3D3D3D;
+  clip-path: inset(0 -100vmax);
+  word-break: keep-all;
+  word-wrap: break-word;
+  padding: 40px 0;
+  text-align: left;
+}
+
+.footer-wrap {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: start;
+  gap: 8px;
+}
+
+.footer-title {
+  font-family: 'Carter One', cursive;
+  font-size: 2.5rem;
+  line-height: 3rem;
+  color:#FF5F15;
+}

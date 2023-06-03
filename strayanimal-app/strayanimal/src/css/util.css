@@ -5,6 +5,16 @@ a, u {
     color:#FFf;
 }
 
+canvas {
+    width: 100% !important;
+    height: fit-content !important;
+    max-width: 100%;
+    min-height: 100%;
+    max-height: 80vh;
+    box-sizing: border-box !important;
+    margin: auto;
+}
+
 /*util class*/
 .horizontal {
     display: -webkit-box;
