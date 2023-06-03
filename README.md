@@ -30,7 +30,9 @@ icon 전환 예정
 
 
 ## 전체 파이프라인
-<img width="1487" alt="image" src="https://github.com/data-dev-course/project2-team1/assets/70497132/74117ad0-3de3-4029-ad1b-d0835c61f486">
+<img width="1515" alt="image" src="https://github.com/data-dev-course/project2-team1/assets/70497132/6ae128ce-d30f-47fa-a34e-3cbb446331b2">
+
+
 
 
 
