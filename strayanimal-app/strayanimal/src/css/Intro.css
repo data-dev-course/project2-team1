@@ -16,10 +16,10 @@
 .intro-orange-line {
     position: absolute;
     height: 10px;
-    width: clamp(10vw, 33vmin, 30%);
+    width: clamp(10vw, 32vmin, 30%);
     border: none;
     background-color: #FF5F15;
-    border-radius: 40px;
+    border-radius: 2px;
 }
 .intro-subtitle {
     color:#fff;

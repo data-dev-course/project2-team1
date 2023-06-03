@@ -24,7 +24,7 @@ export function InnerProtectAnimalList() {
     })
 
     if (status === "loading") {
-        return <div style={{height:"100px", width:"100%"}}><Loading/></div>
+        return <div style={{height:"200px", width:"100%"}}><Loading/></div>
     }
     return (
         <div className="protect-animal-list" style={{margin:"0 0 20px 0"}}>
@@ -33,7 +33,7 @@ export function InnerProtectAnimalList() {
                 <button className="type-select-button" onClick={()=>setKindType("고양이")} style={{backgroundColor: kindType==="고양이"? "#FF5F15": "#4E4E4E"}}>고양이</button>
             </div>
             {data.slice((pageNum-1)*10, pageNum*10).map((elem) => 
-                <AnimalCard src={elem.popfile} age={elem.age} color={elem.colorCd}
+                <AnimalCard key={elem.desertionNo} src={elem.popfile} age={elem.age} color={elem.colorCd}
                 careNm={elem.careNm+"("+elem.careAddr+")"} 
                 kind={elem.kindCd+" "+elem.kindSpcs}
                 sexCd={elem.sexCd} status={elem.specialMark} weight={elem.weight}

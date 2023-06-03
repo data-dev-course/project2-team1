@@ -4,8 +4,8 @@ import Overview from "./Overview";
 function IntroTop() {
     return (
     <div className="intro vertical">
-        <hr className='intro-orange-line for-not-mobile' style={{left:-10}}></hr>
-        <hr className='intro-orange-line for-not-mobile' style={{right:-10}}></hr>
+        <hr className='intro-orange-line for-not-mobile' style={{left:0}}></hr>
+        <hr className='intro-orange-line for-not-mobile' style={{right:0}}></hr>
         <div className="intro-typography">
             Animal<br></br>STAT-US<br></br>Tracker
         </div>
