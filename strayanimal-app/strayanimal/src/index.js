@@ -11,6 +11,7 @@ import  { QueryClient,
 } from '@tanstack/react-query'
 import reportWebVitals from './reportWebVitals';
 import Intro from './components/Intro';
+import ProtectAnimalList from './components/ProtectAnimalList';
 
 const queryClient = new QueryClient()
 /** react-router-dom setting*/
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
       { index: true, element: <Intro /> },
       {
         path: "protect-animal-list",
-        element: <div>유기동물공고</div>,
+        element: <ProtectAnimalList/>,
       },
     ],
   },
