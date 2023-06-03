@@ -11,7 +11,7 @@ import  { QueryClient,
 } from '@tanstack/react-query'
 import reportWebVitals from './reportWebVitals';
 import Intro from './components/Intro';
-import ProtectAnimalList from './components/ProtectAnimalList';
+import ProtectAnimalList, { InnerProtectAnimalList } from './components/ProtectAnimalList';
 
 const queryClient = new QueryClient()
 /** react-router-dom setting*/
@@ -23,8 +23,11 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Intro /> },
       {
-        path: "protect-animal-list",
+        path: "protect-animal-list/:pageNum",
         element: <ProtectAnimalList/>,
+        children: [
+          {index:true, element: <InnerProtectAnimalList/>}
+        ]
       },
     ],
   },
