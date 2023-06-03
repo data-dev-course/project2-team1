@@ -5,6 +5,15 @@ a, u {
     color:#FFf;
 }
 
+p {
+    word-break: keep-all;
+    word-wrap: break-word;
+    color: #eaeaea;
+    font-size: 0.875rem;
+    text-align: left;
+    line-height: 1.2rem;
+}
+
 canvas {
     width: 100% !important;
     height: fit-content !important;
