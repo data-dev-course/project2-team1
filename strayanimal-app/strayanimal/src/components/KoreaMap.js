@@ -2,15 +2,21 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { feature } from 'topojson-client';
 import korea from '../assets/korea-topo.json';
-import countdata from '../assets/export-data_예약8_모든_날짜별_분기별_지역별_유기동물_발생_횟수000000000000.json';
+import Loading from './Loading';
+import { useQuery} from "@tanstack/react-query";
+import db from '../firebase.js';
+import { getDoc, doc } from "firebase/firestore";
 
 const featureData = feature(korea, korea.objects['korea-topo']);
 
 const KoreaMap = () => {
     const chart = useRef(null);
-
-    const printD3 = () => {
-        const width = 600;
+    const {status, data, error} = useQuery(["strayanimal", "koreamap"], async () => {
+        const docSnap = await getDoc(doc(db, "strayanimal", "차트08_모든_날짜별_분기별_지역별_유기동물_발생_횟수"));
+        return docSnap.data().data;
+    })
+    const printD3 = (datasets) => {
+        const width = 400;
         const height = 600;
         const projection = d3.geoMercator().scale(1).translate([0, 0]);
         const path = d3.geoPath().projection(projection);
@@ -24,7 +30,7 @@ const KoreaMap = () => {
         projection.scale(scale).translate(translate);
 
         const colorScale = d3.scaleLinear()
-            .domain([d3.max(countdata, d => parseInt(d.count)), 0])
+            .domain([d3.max(datasets, d => parseInt(d.count)), 0])
             .range(['#FF5F15', '#f0f0f0']);
         
         d3.select("svg").remove(); 
@@ -44,7 +50,7 @@ const KoreaMap = () => {
             .attr('d', path)
             .style('fill', d => {
                 const name = d.properties.CTP_KOR_NM;
-                const matchingData = countdata.find(item => item.name === name);
+                const matchingData = datasets.find(item => item.name === name);
                 
                 if (matchingData) {
                     const count = parseInt(matchingData.count);
@@ -96,7 +102,7 @@ const KoreaMap = () => {
             .on('mouseover', function (event, d) {
                 const [x, y] = d3.pointer(event);
                 const name = d.properties.CTP_KOR_NM;
-                const matchingData = countdata.find(item => item.name === name);
+                const matchingData = datasets.find(item => item.name === name);
 
                 let value = 'No data';
                 if (matchingData) {
@@ -138,7 +144,7 @@ const KoreaMap = () => {
                         d3.select(this)
                             .style('fill', d => {
                                 const name = d.properties.CTP_KOR_NM;
-                                const matchingData = countdata.find(item => item.name === name);
+                                const matchingData = datasets.find(item => item.name === name);
 
                                 if (matchingData) {
                                     const count = parseInt(matchingData.count);
@@ -154,12 +160,14 @@ const KoreaMap = () => {
     };
 
     useEffect(() => {
-        printD3();
-    }, []);
-
-    return (
-        <div ref={chart}></div>
-    );
+        if (status === "success" && data !== undefined) {
+            printD3(data);
+        }
+    }, [status, data]);
+    if (status === "loading") {
+        return <Loading/>;
+    }
+    return <div ref={chart}></div>;
 };
 
 export default KoreaMap;

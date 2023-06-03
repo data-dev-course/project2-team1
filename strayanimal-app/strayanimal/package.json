@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@toast-ui/chart": "^4.6.1",
     "chart.js": "^4.3.0",
+    "chartjs-chart-treemap": "^2.3.0",
     "d3": "^7.8.4",
     "echarts": "^5.4.2",
     "react": "^18.2.0",
