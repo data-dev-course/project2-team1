@@ -29,7 +29,7 @@ icon 전환 예정
 ![image](https://github.com/data-dev-course/project2-team1/assets/70497132/7f18790d-85db-4f48-b3dc-0b74cfdd7546)
 
 
-## 전체 파이프라인
+## 아키텍처
 <img width="1515" alt="image" src="https://github.com/data-dev-course/project2-team1/assets/70497132/6ae128ce-d30f-47fa-a34e-3cbb446331b2">
 
 
