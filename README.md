@@ -1,4 +1,4 @@
-# Animal STAT-US Tracker
+# <img src="./strayanimal-app/strayanimal/public/logo512.png" width="45" height="45"> Animal Stat-us Tracker
 ## **유기동물 조회 API를 이용한 보호소 및 계류상태 분석**
 - 프로젝트 기간 : 2023.05.29 ~ 2023.06.02
 - 유기된 동물의 데이터를 주기적 크롤링, ETL를 통하여 생성한 데이터를 GoogleCloudStorage, GoogleBigquery를 활용하여 적재
