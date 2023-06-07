@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Fugaz+One&family=Shrikhand&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Carter+One&display=swap');
 
 a, u {
     text-decoration: none;
@@ -19,7 +19,7 @@ canvas {
     height: fit-content !important;
     max-width: 100%;
     min-height: 100%;
-    max-height: 80vh;
+    max-height: 80vmax;
     box-sizing: border-box !important;
     margin: auto;
 }
