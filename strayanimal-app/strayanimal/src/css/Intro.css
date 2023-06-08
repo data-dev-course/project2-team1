@@ -75,7 +75,7 @@ animation: bounce2 2s ease infinite;
     }
 }
   
-@media (max-width: 1080px) {
+@media (max-width: 1080px){
     .intro-typography {
         font-size: 6rem;
         line-height: 6.75rem;
@@ -83,9 +83,12 @@ animation: bounce2 2s ease infinite;
     .intro-subtitle {
         font-size: 1rem;
     }
+    .intro-orange-line {
+        width: 22vw;
+    }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 540px), (max-height: 600px)  {
     .intro-typography {
         font-size: 4rem;
         line-height: 4.5rem;
