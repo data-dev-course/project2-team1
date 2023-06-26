@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Fugaz+One&family=Shrikhand&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Carter+One&display=swap');
 
 a, u {
     text-decoration: none;
@@ -15,11 +15,11 @@ p {
 }
 
 canvas {
-    width: 100% !important;
+    width: auto !important;
     height: fit-content !important;
     max-width: 100%;
     min-height: 100%;
-    max-height: 80vh;
+    max-height: 100vh;
     box-sizing: border-box !important;
     margin: auto;
 }
@@ -119,7 +119,7 @@ canvas {
     }
 }
 
-@media (max-width: 420px) and (max-height: 950px) {
+@media (max-width: 540px) and (max-height: 950px) {
     .for-not-mobile {
         display:none;
     }

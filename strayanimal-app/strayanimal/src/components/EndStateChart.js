@@ -13,8 +13,8 @@ function EndStateChart(params) {
         let low60Day = dataset.filter(d => d.lt60Day === 1)
         let above60Day = dataset.filter(d => d.lt60Day === 0)
         const lt60DayDataset = [
-            low60Day.reduce((partialSum, a) => partialSum + parseFloat(a.percentage), 0.0), 
-            above60Day.reduce((partialSum, a) => partialSum + parseFloat(a.percentage), 0.0)]
+            low60Day.reduce((partialSum, a) => partialSum + parseInt(a.count), 0), 
+            above60Day.reduce((partialSum, a) => partialSum + parseInt(a.count), 0)]
         const subDatasetlt60Day = [...low60Day, ...above60Day]
         const backgroundColor = [
             'rgba(255, 99, 132, 1)',
@@ -28,14 +28,15 @@ function EndStateChart(params) {
         return ({
             type: 'doughnut',
             data: {
-                
+                labels:["60일 미만", "60일 이상"],
                 datasets: [{
                     label: '종료상태',
-                    data: subDatasetlt60Day.map((elem) => parseFloat(elem.percentage)),
+                    data: subDatasetlt60Day.map((elem) => parseInt(elem.count)),
                     backgroundColor: backgroundColor,
-                    spacing: 10,
+                    borderColor: backgroundColor,
+                    spacing: 4,
                     labels: datalabels,
-                    borderWidth: 3,
+                    borderWidth: 0,
                     hoverOffset: 5,
                 },
                 {
@@ -44,8 +45,9 @@ function EndStateChart(params) {
                     labels: ["60일 미만", "60일 이상"],
                     backgroundColor: ["#F7464A","#00B3A0"],
                     borderColor: ["#F7464A","#00B3A0"],
-                    weight: 1.3,
-                    borderWidth: 1,
+                    weight: 1.5,
+                    spacing: 1,
+                    borderWidth: 0,
                     hoverOffset: 2,
                 },]
             },
@@ -54,6 +56,7 @@ function EndStateChart(params) {
                 plugins: {
                     legend: {
                         display: false,
+                        legendText : ["60일 미만", "60일 이상"],
                     },
                     tooltip: {
                         callbacks: {
