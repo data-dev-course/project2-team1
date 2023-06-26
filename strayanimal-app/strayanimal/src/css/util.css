@@ -19,7 +19,7 @@ canvas {
     height: fit-content !important;
     max-width: 100%;
     min-height: 100%;
-    max-height: 80vh;
+    max-height: 100vh;
     box-sizing: border-box !important;
     margin: auto;
 }
