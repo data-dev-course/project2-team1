@@ -1,0 +1,35 @@
+# test version
+name: Airflow Deployment
+on:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+    paths:
+      - 'airflow/dags/**'
+# GCP 환경설정
+env:
+  PROJECT_ID: strayanimal
+  GCE_INSTANCE: vm-docker-airflow # TODO: update to instance name
+  GCE_INSTANCE_ZONE: us-east4-a # TODO: update to instance zone
+
+jobs:
+  job_id:
+    runs-on: ubuntu-latest
+    steps:
+    # 해당 레포지토리로 check-out하는 Action을 불러왔습니다.
+    - name: move to airflow folder
+      run: cd ./airflow
+      
+    - uses: actions/checkout@v2
+    
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
+
+    - name: 'Use gcloud CLI'
+      run: 'gcloud info'
