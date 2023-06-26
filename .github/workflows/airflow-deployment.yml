@@ -1,5 +1,6 @@
 # test version
 name: Airflow Deployment
+
 on:
   push:
     branches:
@@ -13,14 +14,15 @@ env:
   GCE_INSTANCE: vm-docker-airflow # TODO: update to instance name
   GCE_INSTANCE_ZONE: us-east4-a # TODO: update to instance zone
 
+
 jobs:
   job_id:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./airflow
     steps:
     # 해당 레포지토리로 check-out하는 Action을 불러왔습니다.
-    - name: move to airflow folder
-      run: cd ./airflow
-      
     - uses: actions/checkout@v2
     
     - id: 'auth'
