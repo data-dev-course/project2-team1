@@ -32,11 +32,12 @@
 }
 
 .protect-animal-list {
-    width: 100%;
+    width: calc(100% - 40px);
     display: grid;
     grid-template-rows: auto auto;
     gap: 20px;
     justify-items: center;
+    margin: 0 20px 20px;
 }
 
 @media (max-width: 480px) {

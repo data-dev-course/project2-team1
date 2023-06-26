@@ -66,6 +66,9 @@
     .pie-chart-container {
         grid-template-columns: 1fr;
     }
+    .highlight-num {
+        font-size: 6rem;
+    }
 }
 
 @media (max-width: 720px) {
