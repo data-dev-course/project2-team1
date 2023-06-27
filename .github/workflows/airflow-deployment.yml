@@ -39,8 +39,9 @@ jobs:
     
     - name: 'Set ssh key file'
       run: |
-        mkdir ~/.ssh
-        cd ~/.ssh
+        cd ~
+        mkdir .ssh
+        cd .ssh
         echo ${{ secrets.GCP_PRIVATE_SSH_KEY }}>>google_compute_engine
 
     - name: SSH gcloud Commands       
