@@ -36,13 +36,15 @@ jobs:
       uses: 'google-github-actions/setup-gcloud@v1'
       with:
         version: '>= 363.0.0'
+    
+    - name: 'Set ssh key file'
+      run: |
+        mkdir ~/.ssh
+        cd ~/.ssh
+        echo ${{ secrets.GCP_PRIVATE_SSH_KEY }}>>google_compute_engine
 
-    - name: SSH Remote Commands
-      uses: appleboy/ssh-action@v0.1.4        
-      with:
-        host: ${{ secrets.HOST }}        
-        username: runner
-        key: ${{ secrets.GCP_PRIVATE_SSH_KEY }}
-        port: 22
-        script: |
-          sudo su root && cd ~/airflow && git pull
+    - name: SSH gcloud Commands       
+      run: gcloud compute ssh ${{ env.GCE_INSTANCE }}/ 
+        --zone=${{ env.GCE_INSTANCE_ZONE }}/
+        --project=${{ env.PROJECT_ID }}/
+        --command="sudo su root && cd ~/airflow && git pull"
