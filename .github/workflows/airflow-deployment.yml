@@ -7,7 +7,7 @@ on:
       - 'main'
       - 'develop'
     paths:
-      - 'airflow/dags/**'
+      - 'airflow/**'
 # GCP 환경설정
 env:
   PROJECT_ID: strayanimal
