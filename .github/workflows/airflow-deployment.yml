@@ -26,11 +26,6 @@ jobs:
       uses: actions/checkout@v3
       with: 
         sparse-checkout: 'airflow'
-      
-    - name: 'Current Path'
-      run: |
-        ls -al
-        pwd
     
     - id: 'auth'
       uses: 'google-github-actions/auth@v1'
@@ -42,7 +37,7 @@ jobs:
       with:
         version: '>= 363.0.0'
     
-    - name: 'Set ssh key file'
+    - name: 'Set SSH key pair file'
       run: |
         cd ~
         mkdir .ssh
@@ -51,13 +46,7 @@ jobs:
         echo "${{ secrets.GCP_PUBLIC_SSH_KEY }}">>google_compute_engine.pub
         chmod 400 google_compute_engine
 
-    - name: SSH gcloud Commands       
-      run: gcloud compute ssh ${{ env.GCE_INSTANCE }} 
-        --zone=${{ env.GCE_INSTANCE_ZONE }}
-        --project=${{ env.PROJECT_ID }}
-        --command="cd ~/airflow"
-
-    - name: SCP gcloud Commands       
+    - name: 'Copy Github airflow folder gcloud Commands SCP'    
       run: gcloud compute scp 
         --zone=${{ env.GCE_INSTANCE_ZONE }}
         --project=${{ env.PROJECT_ID }} --recurse
