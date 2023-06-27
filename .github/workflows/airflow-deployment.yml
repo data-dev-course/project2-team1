@@ -60,5 +60,5 @@ jobs:
     - name: SCP gcloud Commands       
       run: gcloud compute scp 
         --zone=${{ env.GCE_INSTANCE_ZONE }}
-        --project=${{ env.PROJECT_ID }}
+        --project=${{ env.PROJECT_ID }} --recurse
         /home/runner/work/project2-team1/project2-team1/airflow ${{ env.GCE_INSTANCE }}:~/airflow
