@@ -13,7 +13,6 @@ env:
   PROJECT_ID: strayanimal
   GCE_INSTANCE: vm-docker-airflow # TODO: update to instance name
   GCE_INSTANCE_ZONE: us-east4-a # TODO: update to instance zone
-  USER: kangdiamond
 
 jobs:
   update-dags:
@@ -38,5 +37,5 @@ jobs:
       with:
         instance_name: '"${{ env.GCE_INSTANCE }}"'
         zone: '"${{ env.GCE_INSTANCE_ZONE }}"'
-        ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+        ssh_private_key: '${{ secrets.GCP_PRIVATE_SSH_KEY }}'
         command: 'echo Hello world'
