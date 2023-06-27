@@ -1,5 +1,6 @@
 # test version
 name: Airflow Deployment
+
 on:
   push:
     branches:
@@ -21,20 +22,24 @@ jobs:
         working-directory: ./airflow
     steps:
     # 해당 레포지토리로 check-out하는 Action을 불러왔습니다.
-    - uses: actions/checkout@v3
+    - name: Checkout airflow folder
+      uses: actions/checkout@v3
       with: 
         sparse-checkout: 'airflow'
-      
-    - name: 'checkout test'
-      run: ls -al
       
     - id: 'auth'
       uses: 'google-github-actions/auth@v1'
       with:
         credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
 
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v1'
-
-    - name: 'Use gcloud CLI'
-      run: 'gcloud info'
+    - id: 'compute-ssh'
+      uses: 'google-github-actions/ssh-compute@v0'
+      with:
+        project_id: '${{ env.PROJECT_ID }}'
+        instance_name: '${{ env.GCE_INSTANCE }}'
+        zone: '${{ env.GCE_INSTANCE_ZONE }}'
+        ssh_private_key: '${{ secrets.GCP_PRIVATE_SSH_KEY }}'
+        command: >
+          sudo su root &&
+          cd ~/airflow && 
+          git pull
