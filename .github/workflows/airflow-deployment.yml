@@ -37,5 +37,11 @@ jobs:
       with:
         version: '>= 363.0.0'
 
-    - name: 'Use gcloud CLI'
+    - name: 'Use gcloud CLI to connect GCE'
       run: 'gcloud compute ssh --zone ${{env.GCE_INSTANCE_ZONE}} ${{env.GCE_INSTANCE}} --project ${{env.PROJECT_ID}}'
+
+    - name: 'Copy dags folder'
+      run: |
+        sudo su root
+        cd ~/airflow
+        git pull
