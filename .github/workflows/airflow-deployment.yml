@@ -39,12 +39,11 @@ jobs:
     
     - name: 'Generate Environment Variables File for Production'
       run: |
-        mkdir /home/runner/.ssh
-        cd /home/runner/.ssh
-        echo "${{ secrets.GCP_PRIVATE_SSH_KEY }}>>google_compute_engine"
+        mkdir /home/runner/.ssh 
+        echo "${{ secrets.GCP_PRIVATE_SSH_KEY }}>>/home/runner/.ssh/google_compute_engine"
 
     - name: 'Use gcloud CLI to connect GCE'
-      run: 'gcloud compute ssh --zone ${{env.GCE_INSTANCE_ZONE}} ${{env.GCE_INSTANCE}} --project ${{env.PROJECT_ID}}'
+      run: 'ssh -i /home/runner/.ssh/google_compute_engine runner@35.245.201.91'
 
     - name: 'Copy dags folder'
       run: sudo su root && cd ~/airflow && git pull
