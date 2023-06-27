@@ -36,12 +36,15 @@ jobs:
       uses: 'google-github-actions/setup-gcloud@v1'
       with:
         version: '>= 363.0.0'
+    
+    - name: 'Generate Environment Variables File for Production'
+      run: |
+        mkdir /home/runner/.ssh
+        cd /home/runner/.ssh
+        echo "${{ secrets.GCP_PRIVATE_SSH_KEY }}>>google_compute_engine"
 
     - name: 'Use gcloud CLI to connect GCE'
       run: 'gcloud compute ssh --zone ${{env.GCE_INSTANCE_ZONE}} ${{env.GCE_INSTANCE}} --project ${{env.PROJECT_ID}}'
 
     - name: 'Copy dags folder'
-      run: |
-        sudo su root
-        cd ~/airflow
-        git pull
+      run: sudo su root && cd ~/airflow && git pull
