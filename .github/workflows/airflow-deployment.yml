@@ -45,7 +45,7 @@ jobs:
         echo "${{ secrets.GCP_PRIVATE_SSH_KEY }}">>google_compute_engine
 
     - name: SSH gcloud Commands       
-      run: gcloud compute ssh ${{ env.GCE_INSTANCE }}/ 
-        --zone=${{ env.GCE_INSTANCE_ZONE }}/
-        --project=${{ env.PROJECT_ID }}/
+      run: gcloud compute ssh ${{ env.GCE_INSTANCE }} 
+        --zone=${{ env.GCE_INSTANCE_ZONE }}
+        --project=${{ env.PROJECT_ID }}
         --command="sudo su root && cd ~/airflow && git pull"
