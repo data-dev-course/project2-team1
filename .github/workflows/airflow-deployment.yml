@@ -32,10 +32,10 @@ jobs:
       with:
         credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
 
-    - id: 'compute-ssh'
-      uses: 'google-github-actions/ssh-compute@v0'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
       with:
-        instance_name: '${{ env.GCE_INSTANCE }}'
-        zone: '${{ env.GCE_INSTANCE_ZONE }}'
-        ssh_private_key: '${{ secrets.GCP_PRIVATE_SSH_KEY }}'
-        command: 'echo Hello world'
+        version: '>= 363.0.0'
+
+    - name: 'Use gcloud CLI'
+      run: 'gcloud compute ssh --zone ${{env.GCE_INSTANCE_ZONE}} ${{env.GCE_INSTANCE}} --project ${{env.PROJECT_ID}}'
