@@ -23,7 +23,7 @@ jobs:
     # 해당 레포지토리로 check-out하는 Action을 불러왔습니다.
     - uses: actions/checkout@v3
       with: 
-        sparse-checkout: 'airflow/**'
+        sparse-checkout: '/airflow'
       
     - name: 'checkout test'
       run: ls -al
