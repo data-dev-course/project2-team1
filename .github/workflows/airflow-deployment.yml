@@ -43,6 +43,7 @@ jobs:
         mkdir .ssh
         cd .ssh
         echo "${{ secrets.GCP_PRIVATE_SSH_KEY }}">>google_compute_engine
+        echo "${{ secrets.GCP_PUBLIC_SSH_KEY }}">>google_compute_engine.pub
 
     - name: SSH gcloud Commands       
       run: gcloud compute ssh ${{ env.GCE_INSTANCE }} 
