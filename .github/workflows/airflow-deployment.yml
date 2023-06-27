@@ -56,3 +56,9 @@ jobs:
         --zone=${{ env.GCE_INSTANCE_ZONE }}
         --project=${{ env.PROJECT_ID }}
         --command="cd ~/airflow"
+
+    - name: SCP gcloud Commands       
+      run: gcloud compute scp 
+        --zone=${{ env.GCE_INSTANCE_ZONE }}
+        --project=${{ env.PROJECT_ID }}
+        /home/runner/work/project2-team1/project2-team1/airflow ${{ env.GCE_INSTANCE }}:~/airflow
