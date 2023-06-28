@@ -1,7 +1,9 @@
 name: Firebase Webapp Deploy Hosting
   
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - main
     paths:
@@ -9,6 +11,7 @@ on:
 
 jobs:
   deploy_live_website:
+    if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     defaults:
       run:
