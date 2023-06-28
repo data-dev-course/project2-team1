@@ -2,7 +2,6 @@ from airflow import DAG
 from airflow.decorators import task
 from datetime import datetime
 
-
 @task
 def print_hello():
     print("hello!")
