@@ -51,14 +51,14 @@ with DAG(
     @task
     def direct_load(dic_list):
         firestore_client = get_firestore_connection()
-        firestore_client.collection("test_collection").document("{{chart_name}}").set({"data":dic_list})
+        firestore_client.collection("strayanimal").document("{{chart_name}}").set({"data":dic_list})
         print("문서 저장 완료")
 
     @task
     def sub_collection_load(dic_list):
         firestore_client = get_firestore_connection()
         batch = firestore_client.batch()
-        parent_doc_ref = firestore_client.collection("test_collection").document("차트12_유기동물_상세정보")
+        parent_doc_ref = firestore_client.collection("strayanimal").document("차트12_유기동물_상세정보")
 
         # 데이터를 500개씩 잘라 배치 처리해서 저장
         batch_size = 500
@@ -82,7 +82,7 @@ with DAG(
     def sub_collection_if_exist_delete():
         firestore_client = get_firestore_connection()
         sub_collection_name = "{{chart_name}}"
-        parent_doc_ref = firestore_client.collection("test_collection").document("차트12_유기동물_상세정보")
+        parent_doc_ref = firestore_client.collection("strayanimal").document("차트12_유기동물_상세정보")
         
         # 해당 컬렉션이 존재하는지 체크
         sub_collections = parent_doc_ref.collections()
