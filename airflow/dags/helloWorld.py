@@ -10,6 +10,7 @@ dag = DAG(
     schedule="0 2 * * *",
 )
 
+
 def print_hello():
     print("hello!")
     return "hello!"
