@@ -1,0 +1,30 @@
+name: Firebase Webapp Deploy Hosting
+  
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "strayanimal-app/**"
+
+jobs:
+  deploy_live_website:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./strayanimal-app
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          sparse-checkout: 'strayanimal-app'
+            
+      - name: 'Build Application'
+        run: npm ci && npm run build
+      
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_STRAYANIMAL }}"
+          projectId: strayanimal
+          channelId: live
