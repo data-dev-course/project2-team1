@@ -1,5 +1,7 @@
 from airflow import DAG
-from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
+from airflow.providers.google.cloud.operators.bigquery import (
+    BigQueryExecuteQueryOperator,
+)
 
 from datetime import datetime
 
@@ -50,20 +52,20 @@ excute_sql = """
     """
 
 with DAG(
-    dag_id = 'bigquery_transform', 
-    start_date = datetime(2023, 6, 26),
-    schedule = '20 15 * * *',
-    max_active_runs = 1,
-    schedule_interval=None
+    dag_id="bigquery_transform",
+    start_date=datetime(2023, 6, 26),
+    schedule="20 15 * * *",
+    max_active_runs=1,
+    schedule_interval=None,
 ) as dag:
     bigquery_create_analytics_table = BigQueryExecuteQueryOperator(
-    task_id = 'excute_query',
-    gcp_conn_id = "bigquery_connection",
-    # 레거시SQL(true) 또는 표준SQL(false) 사용여부
-    use_legacy_sql = False,
-    # 쿼리 결과 저장 설적
-    destination_dataset_table = 'strayanimal.analytics.analytics_test',
-    # 대상 테이블이 이미 있는 경우 발생하는 작업 지정
-    write_disposition= 'WRITE_TRUNCATE',
-    sql = excute_sql
+        task_id="excute_query",
+        gcp_conn_id="bigquery_connection",
+        # 레거시SQL(true) 또는 표준SQL(false) 사용여부
+        use_legacy_sql=False,
+        # 쿼리 결과 저장 설적
+        destination_dataset_table="strayanimal.analytics.analytics_test",
+        # 대상 테이블이 이미 있는 경우 발생하는 작업 지정
+        write_disposition="WRITE_TRUNCATE",
+        sql=excute_sql,
     )
