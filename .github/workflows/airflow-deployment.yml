@@ -53,8 +53,15 @@ jobs:
         echo "${{ secrets.GCP_PUBLIC_SSH_KEY }}">>google_compute_engine.pub
         chmod 400 google_compute_engine
 
-    - name: 'Copy Github airflow folder gcloud Commands SCP'    
+    - name: 'Copy Github airflow folder to tmp: SCP'    
       run: gcloud compute scp 
         --zone=${{ env.GCE_INSTANCE_ZONE }}
         --project=${{ env.PROJECT_ID }} --recurse
-        /home/runner/work/project2-team1/project2-team1/airflow runner@${{ env.GCE_INSTANCE }}:~
+        /home/runner/work/project2-team1/project2-team1/airflow runner@${{ env.GCE_INSTANCE }}:/tmp
+    
+    - name: 'Copy /tmp/airflow to ~/airflow'
+      run: gcloud compute ssh ${{ env.GCE_INSTANCE }}
+        --zone=${{ env.GCE_INSTANCE_ZONE }}
+        --project=${{ env.PROJECT_ID }}
+        --command="sudo cp -rlf /tmp/airflow/* ~/airflow"
+
