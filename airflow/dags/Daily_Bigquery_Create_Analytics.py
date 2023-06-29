@@ -8,7 +8,7 @@ from datetime import datetime
 
 excute_sql = """
     SELECT 
-    desertionNo,
+    DISTINCT(desertionNo),
     happenDt,
     happenPlace,
     REGEXP_EXTRACT(kindCd, r'\[(.*?)\]') AS kindCd, 
