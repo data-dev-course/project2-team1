@@ -1,0 +1,137 @@
+import os
+import json
+import datetime
+from airflow import DAG
+from airflow.decorators import task
+from google.cloud import bigquery
+from google.cloud import firestore
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
+
+default_args = {
+    "owner": "ih-tjpark",
+    "depends_on_past": False,
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "retries": 1
+}
+
+def get_bigquery_connection():
+    cridential = GoogleBaseHook(gcp_conn_id="gcp_conn_service").get_credentials()
+    bigquery_client = bigquery.Client(credentials=cridential)
+    return bigquery_client
+
+def get_firestore_connection():
+    cridential = GoogleBaseHook(gcp_conn_id="gcp_conn_service").get_credentials()
+    firestore_client = firestore.Client(credentials=cridential)
+    return firestore_client
+
+with DAG(
+    dag_id= "Daily_Bigquery_to_Firestore_{{chart_num}}",
+    start_date= datetime.datetime(2023, 6, 27),
+    schedule_interval= {{schedule}},
+    catchup = False,
+    default_args=default_args,
+    tags=['dynamic_dag', 'trigger']
+    ) as dag:
+
+    @task
+    def extract():
+        bigquery_client = get_bigquery_connection()
+        query_job = bigquery_client.query("{{query}}")
+        results = query_job.to_dataframe().to_json(orient='records')
+        print("{{chart_name}} data 추출 완료")
+        return results
+
+    @task
+    def transform(row_data):
+        dic_list = []
+        row_data_list = json.loads(row_data)
+        for dic_row in row_data_list:
+            for col in dic_row:
+                if isinstance(dic_row[col], datetime.date):
+                    dic_row[col] = dic_row[col].strftime('%Y-%m-%d')
+            dic_list.append(dic_row) 
+        print("{{chart_name}} data 변환 완료")
+        return dic_list
+
+    @task
+    def direct_load(dic_list):
+        firestore_client = get_firestore_connection()
+        firestore_client.collection("test_collection").document("{{chart_name}}").set({"data":dic_list})
+        print("{{chart_name}} 문서 저장 완료")
+
+    @task
+    def sub_collection_load(dic_list):
+        firestore_client = get_firestore_connection()
+        batch = firestore_client.batch()
+        parent_doc_ref = firestore_client.collection("test_collection").document("차트12_유기동물_상세정보")
+
+        # 데이터를 500개씩 잘라 배치 처리해서 저장
+        batch_size = 500
+        load_count = 0
+
+        for dic in dic_list:
+            notice_num = str(dic['desertionNo'])
+            sub_doc_ref = parent_doc_ref.collection("{{chart_name}}").document("공고번호_"+notice_num)
+            batch.set(sub_doc_ref, dic)
+            load_count +=1 
+
+            if load_count % batch_size == 0:
+                batch.commit()
+                batch = firestore_client.batch()
+
+        if load_count % batch_size != 0:
+            batch.commit()
+            print(f"{load_count}개 문서 저장 완료")
+
+    @task
+    def sub_collection_if_exist_delete():
+        firestore_client = get_firestore_connection()
+        sub_collection_name = "{{chart_name}}"
+        parent_doc_ref = firestore_client.collection("test_collection").document("차트12_유기동물_상세정보")
+        
+        # 해당 컬렉션이 존재하는지 체크
+        sub_collections = parent_doc_ref.collections()
+        collection_exists = any(collection.id == sub_collection_name for collection in sub_collections)
+        if collection_exists:
+            print(sub_collection_name, ' 컬렉션이 존재해 삭제합니다.')
+            sub_collection_ref = parent_doc_ref.collection(sub_collection_name)
+            
+            # 문서 500개씩 가지고와 배치 처리해서 삭제 (모든 문서를 가지고 오면 메모리 제한에 걸릴 수 있음)
+            batch_size = 500
+            while True:
+                docs = sub_collection_ref.limit(batch_size).stream()
+                batch = firestore_client.batch()
+                batch_count = 0
+
+                for doc in docs:
+                    batch.delete(doc.reference)
+                    batch_count += 1
+
+                if batch_count == 0:
+                    # 삭제할 문서가 더 이상 없으면 반복문 종료
+                    break
+
+                batch.commit()
+            print('컬렉션 삭제를 완료했습니다.')
+
+        else:
+            print(sub_collection_name, ' 컬렉션이 존재하지 않습니다. 다음 작업을 진행합니다.')
+
+    trigger = TriggerDagRunOperator(
+        task_id='trigger',
+        trigger_dag_id='Daily_Bigquery_to_Firestore_{{trigger_chart_num}}',
+        wait_for_completion=False,
+        poke_interval=30,
+        allowed_states=["success"],
+    )
+
+    if "차트12" in "{{chart_name}}":
+        sub_collection_if_exist_delete() >> sub_collection_load(transform(extract())) {{call_trigger}}
+    else:
+        direct_load(transform(extract())) {{call_trigger}}
+
+
+
+

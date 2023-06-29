@@ -8,15 +8,14 @@ import os
 import json
 import requests
 import pandas as pd
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
+from datetime import datetime
 from pytz import timezone
 from google.cloud import storage
 
 DAG_ID = "Quarter_OpenAPI_today"
 dag = DAG(
     DAG_ID,
-    schedule_interval="*/5 * * * *",
+    schedule_interval="*/10 * * * *",
     start_date=datetime(2023, 6, 25),
     catchup=False,
 )
@@ -81,6 +80,9 @@ def extract_data_OpenAPI(**context):
                 print(today_HM, "성공 데이터 :", result_df.shape[0])
                 break
         except Exception as e:
+            if e == "item":
+                print(today_HM + "기준", "등록된 유기동물 데이터가 없습니다.")
+                break
             print(today_HM, "error :", e)
     else:
         raise AirflowException("10회 이상 추출 실패, OpenAPI 서버 문제로 추출 중단")
@@ -99,10 +101,9 @@ def upload_data_GCS(**context):
     SAVE_NAME, LOCAL_PATH_NAME = context["ti"].xcom_pull(
         task_ids="extract_data_OpenAPI"
     )
-    # print(SAVE_NAME, LOCAL_PATH_NAME)
 
     # LOCAL_PATH_NAME = 'strayanimal_today_data_20230625-0000.csv'
-    # LOCAL_PATH_NAME[:-9]로 사용
+    # SAVE_NAME[:-9]로 사용
     SAVE_NAME, SAVE_VERSION_NAME = SAVE_NAME[:-9], SAVE_NAME[-8:-4]
 
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(
@@ -121,7 +122,7 @@ def upload_data_GCS(**context):
     # 파일 업로드
     blob.upload_from_filename(LOCAL_PATH_NAME, content_type="text/csv")
 
-    print("Cloud Storage 적재 성공", datetime.now())
+    print("Cloud Storage 적재 성공")
 
 
 extract = PythonOperator(
