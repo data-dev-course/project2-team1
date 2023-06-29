@@ -54,7 +54,7 @@ function dataSetModification(data) {
 
 function BarChartQuart() {
     const chartRef = useRef(null);
-    const {status, data, error} = useQuery(["strayanimal", "quarterdata"], async () => {
+    const {status, data} = useQuery(["strayanimal", "quarterdata"], async () => {
         const docSnap = await getDoc(doc(db, "strayanimal", "차트07_분기별_유기발생_건수"));
         return docSnap.data().data;
     })

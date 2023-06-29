@@ -11,7 +11,7 @@ const featureData = feature(korea, korea.objects['korea-topo']);
 
 const KoreaMap = () => {
     const chart = useRef(null);
-    const {status, data, error} = useQuery(["strayanimal", "koreamap"], async () => {
+    const {status, data} = useQuery(["strayanimal", "koreamap"], async () => {
         const docSnap = await getDoc(doc(db, "strayanimal", "차트08_모든_날짜별_분기별_지역별_유기동물_발생_횟수"));
         return docSnap.data().data;
     })

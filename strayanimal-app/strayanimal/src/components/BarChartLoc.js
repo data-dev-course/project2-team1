@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import Loading from './Loading';
@@ -7,7 +8,7 @@ import { getDoc, doc } from "firebase/firestore";
 
 function BarChartLoc() {
     const chartRef = useRef(null);
-    const {status, data, error} = useQuery(["strayanimal", "locStatedata"], async () => {
+    const { status, data } = useQuery(["strayanimal", "locStatedata"], async () => {
         const docSnap = await getDoc(doc(db, "strayanimal", "차트05_지역별_보호_종료_상태_비율"));
         return docSnap.data().data;
     })
