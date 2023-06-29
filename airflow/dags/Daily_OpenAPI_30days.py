@@ -200,23 +200,16 @@ def load_to_bigquery(**context):
     temp_table_id = "quarter_temp"
     df = context["ti"].xcom_pull(task_ids="transform_data")
 
-    # BigQuery 클라이언트 인스턴스 생성
-    bigquery_client = bigquery.Client()
-
     # 데이터프레임을 로드할 테이블 경로 설정
     table_path = f"{project_id}.{dataset_id}.{table_id}"
     temp_table_path = f"{project_id}.{dataset_id}.{temp_table_id}"
-
+    
     # 이전 작업을 위한 백업 테이블명
     backup_table_id = "backup_table"
     
     # BigQuery 클라이언트 인스턴스 생성
     bigquery_client = bigquery.Client()
 
-    # 데이터프레임을 로드할 테이블 경로 설정
-    table_path = f'{project_id}.{dataset_id}.{table_id}'
-    temp_table_path = f'{project_id}.{dataset_id}.{temp_table_id}'
-    
     try:
         # 이전 작업을 위해 원본 테이블을 백업
         backup_table_ref = bigquery_client.copy_table(table_path, backup_table_id)
@@ -224,6 +217,7 @@ def load_to_bigquery(**context):
         # 백업 실패 시 처리할 예외 처리 로직 작성
         pass
     
+
     try:
         # 테이블 존재 여부 확인
         bigquery_client.get_table(table_path)
@@ -235,7 +229,9 @@ def load_to_bigquery(**context):
     # 테이블가 존재하지 않는 경우에만 새로운 테이블 생성
     if not table_exists:
         schema = bigquery_schema
-        table_ref = bigquery_client.create_table(bigquery.Table(table_path, schema=schema))
+        table_ref = bigquery_client.create_table(
+            bigquery.Table(table_path, schema=schema)
+        )
     else:
         table_ref = bigquery_client.get_table(table_path)
     
@@ -269,6 +265,7 @@ def load_to_bigquery(**context):
         bigquery_client.delete_table(temp_table_path)
         
         print('failed')
+
 
 
 extract = PythonOperator(
