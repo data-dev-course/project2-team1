@@ -1,5 +1,7 @@
 from airflow import DAG
-from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
+from airflow.providers.google.cloud.operators.bigquery import (
+    BigQueryExecuteQueryOperator,
+)
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
 from datetime import datetime
@@ -70,8 +72,8 @@ with DAG(
     )
 
     trigger = TriggerDagRunOperator(
-        task_id='trigger',
-        trigger_dag_id='Daily_Bigquery_to_Firestore_chart_01',
+        task_id="trigger",
+        trigger_dag_id="Daily_Bigquery_to_Firestore_chart_01",
         wait_for_completion=False,
         poke_interval=30,
         allowed_states=["success"],
