@@ -59,6 +59,7 @@ jobs:
           path: dist
   deploy:
     if: github.event.pull_request.merged == true
+    needs: build
     runs-on: ubuntu-latest
     defaults:
       run:
