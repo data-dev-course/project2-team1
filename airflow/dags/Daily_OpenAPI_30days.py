@@ -197,7 +197,7 @@ def load_to_bigquery(**context):
     project_id = context["params"]["project_id"]
     dataset_id = context["params"]["dataset_id"]
     table_id = context["params"]["table_id"]
-    temp_table_id = "quarter_temp"
+    temp_table_id = "daily_temp"
     df = context["ti"].xcom_pull(task_ids="transform_data")
 
     # 데이터프레임을 로드할 테이블 경로 설정
