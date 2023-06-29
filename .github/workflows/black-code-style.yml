@@ -1,38 +1,20 @@
-# 워크플로 이름 
-name: black-action
-# develop branch 로 push 했을 때에만 작동하도록 
+name: Format code
+
 on:
   push:
-    branches:
-      - 'develop'
+    branches: [ develop ]
 
 jobs:
-  linter_name:
-    name: runner / black
+  format:
     runs-on: ubuntu-latest
     steps:
-    # 현재 리포 체크아웃
       - uses: actions/checkout@v2
-      - name: Check files using the black formatter
-      # rickstaa/action-black 액션을 사용
-        uses: rickstaa/action-black@v1
-        id: action_black
-        with:
-        # 모든 파일을 대상으로 포매팅을 수행
-          black_args: "."
-      - name: Create Pull Request
-      # 수정해야 할 것이 있다면 PR 생성 ( 기존 Branch로 보내는 PR ) 
-        if: steps.action_black.outputs.is_formatted == 'true'
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.TOKEN }}
-          title: "Format Python code with psf/black push"
-          commit-message: "Modify Format Python code with psf/black"
-          body: |
-            There appear to be some python formatting errors in ${{ github.sha }}. This pull request
-            uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
-          base: ${{ github.head_ref }} # Creates pull request onto pull request or commit branch
-          branch: actions/black
-      - name: Exit Workflow
-        if: steps.action_black.outputs.is_formatted == 'true'
-        run: exit 1
+      - name: Format code with black
+        run: |
+          pip install black
+          black *.py
+          git config user.name ${{ github.actor }}
+          git config user.email ${{ github.actor }}@users.noreply.github.com
+          git add .
+          git commit -m "Format code with black"
+          git push
