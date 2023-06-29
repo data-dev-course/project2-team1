@@ -55,7 +55,6 @@ def extract_data_OpenAPI(**context):
             "chargeNm",
             "officetel",
             "noticeComment",
-            
         ]
     )
 
@@ -133,73 +132,66 @@ def upload_data_GCS(**context):
 
 
 def read_data_from_storage(**context):
-    
     bucket_name = context["params"]["bucket_name"]
     today = datetime.now(timezone("Asia/Seoul")).strftime("%Y%m%d")
-    file_name = f'raw-data/strayanimal-today_data/strayanimal_today_data_{today}'
-    
-    
+    file_name = f"raw-data/strayanimal-today_data/strayanimal_today_data_{today}"
+
     storage_client = storage.Client()
     blob = storage_client.get_bucket(bucket_name).get_blob(file_name)
     csv_data = blob.download_as_text().splitlines()
-    df = pd.read_csv(io.StringIO('\n'.join(csv_data)))
-    
-    print(f'{file_name} 읽어오기 성공')
-    
+    df = pd.read_csv(io.StringIO("\n".join(csv_data)))
+
+    print(f"{file_name} 읽어오기 성공")
+
     return df
 
 
 def transform_data(**context):
-    
-    df = context["ti"].xcom_pull(
-        task_ids="read_data_from_storage"
-    )
-    
-    
-    if len(df) > 0 :
-        df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1)
-        if 'noticeComment' not in df.columns:
-            df['noticeComment'] = np.nan
-            
-        df['desertionNo'] = df['desertionNo'].astype(int)
-        df['happenDt'] = pd.to_datetime(df['happenDt'], format='%Y%m%d')
-        df['noticeEdt'] = pd.to_datetime(df['noticeEdt'], format='%Y%m%d')
-        df['noticeSdt'] = pd.to_datetime(df['noticeSdt'], format='%Y%m%d')
-        print('data 변환 성공')
-    
-    else :
-        print('변환할 데이터 없음')
-    
+    df = context["ti"].xcom_pull(task_ids="read_data_from_storage")
 
-    
+    if len(df) > 0:
+        df = df.drop(df.columns[df.columns.str.contains("unnamed", case=False)], axis=1)
+        if "noticeComment" not in df.columns:
+            df["noticeComment"] = np.nan
+
+        df["desertionNo"] = df["desertionNo"].astype(int)
+        df["happenDt"] = pd.to_datetime(df["happenDt"], format="%Y%m%d")
+        df["noticeEdt"] = pd.to_datetime(df["noticeEdt"], format="%Y%m%d")
+        df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
+        print("data 변환 성공")
+
+    else:
+        print("변환할 데이터 없음")
+
     return df
+
 
 def load_to_bigquery(**context):
     bigquery_schema = [
-        bigquery.SchemaField("desertionNo","INTEGER"),
-        bigquery.SchemaField("filename","STRING"),
-        bigquery.SchemaField("happenDt","DATETIME"),    
-        bigquery.SchemaField("happenPlace","STRING"),    
-        bigquery.SchemaField("kindCd","STRING"),    
-        bigquery.SchemaField("colorCd","STRING"),    
-        bigquery.SchemaField("age","STRING"),    
-        bigquery.SchemaField("weight","STRING"),    
-        bigquery.SchemaField("noticeNo","STRING"),    
-        bigquery.SchemaField("noticeSdt","DATETIME"),
-        bigquery.SchemaField("noticeEdt","DATETIME"),
-        bigquery.SchemaField("popfile","STRING"),    
-        bigquery.SchemaField("processState","STRING"),    
-        bigquery.SchemaField("sexCd","STRING"),    
-        bigquery.SchemaField("neuterYn","STRING"),    
-        bigquery.SchemaField("specialMark","STRING"),    
-        bigquery.SchemaField("careNm","STRING"),    
-        bigquery.SchemaField("careTel","STRING"),    
-        bigquery.SchemaField("careAddr","STRING"),    
-        bigquery.SchemaField("orgNm","STRING"),    
-        bigquery.SchemaField("chargeNm","STRING"),    
-        bigquery.SchemaField("officetel","STRING"),    
-        bigquery.SchemaField("noticeComment","STRING"),    
-    ] 
+        bigquery.SchemaField("desertionNo", "INTEGER"),
+        bigquery.SchemaField("filename", "STRING"),
+        bigquery.SchemaField("happenDt", "DATETIME"),
+        bigquery.SchemaField("happenPlace", "STRING"),
+        bigquery.SchemaField("kindCd", "STRING"),
+        bigquery.SchemaField("colorCd", "STRING"),
+        bigquery.SchemaField("age", "STRING"),
+        bigquery.SchemaField("weight", "STRING"),
+        bigquery.SchemaField("noticeNo", "STRING"),
+        bigquery.SchemaField("noticeSdt", "DATETIME"),
+        bigquery.SchemaField("noticeEdt", "DATETIME"),
+        bigquery.SchemaField("popfile", "STRING"),
+        bigquery.SchemaField("processState", "STRING"),
+        bigquery.SchemaField("sexCd", "STRING"),
+        bigquery.SchemaField("neuterYn", "STRING"),
+        bigquery.SchemaField("specialMark", "STRING"),
+        bigquery.SchemaField("careNm", "STRING"),
+        bigquery.SchemaField("careTel", "STRING"),
+        bigquery.SchemaField("careAddr", "STRING"),
+        bigquery.SchemaField("orgNm", "STRING"),
+        bigquery.SchemaField("chargeNm", "STRING"),
+        bigquery.SchemaField("officetel", "STRING"),
+        bigquery.SchemaField("noticeComment", "STRING"),
+    ]
 
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(
         os.environ["AIRFLOW_HOME"], "keys", "load_to_bigquery_raw_data.json"
@@ -208,13 +200,13 @@ def load_to_bigquery(**context):
     dataset_id = context["params"]["dataset_id"]
     table_id = context["params"]["table_id"]
     df = context["ti"].xcom_pull(task_ids="transform_data")
-    
+
     # BigQuery 클라이언트 인스턴스 생성
     bigquery_client = bigquery.Client()
-    
+
     # 데이터프레임을 로드할 테이블 경로 설정
-    table_path = f'{project_id}.{dataset_id}.{table_id}'
-    
+    table_path = f"{project_id}.{dataset_id}.{table_id}"
+
     # 테이블이 이미 존재하는지 확인
     try:
         table = bigquery_client.get_table(table_path)
@@ -233,8 +225,11 @@ def load_to_bigquery(**context):
 
     # 데이터프레임을 대상 테이블로 적재
     job_config = bigquery.LoadJobConfig(schema=bigquery_schema)
-    job = bigquery_client.load_table_from_dataframe(df, table_ref, job_config=job_config)
+    job = bigquery_client.load_table_from_dataframe(
+        df, table_ref, job_config=job_config
+    )
     job.result()  # Job 실행 완료 대기
+
 
 extract = PythonOperator(
     dag=dag,
@@ -257,8 +252,8 @@ read = PythonOperator(
     task_id="read_data_from_storage",
     python_callable=read_data_from_storage,
     params={
-        "bucket_name" : "strayanimal-bucket",
-    }
+        "bucket_name": "strayanimal-bucket",
+    },
 )
 
 
@@ -272,9 +267,9 @@ load = PythonOperator(
     task_id="load_to_bigquery",
     python_callable=load_to_bigquery,
     params={
-        "dataset_id" : "raw_data",
-        "table_id" : "animal_daily",
-        "project_id":"strayanimal",
-    }
+        "dataset_id": "raw_data",
+        "table_id": "animal_daily",
+        "project_id": "strayanimal",
+    },
 )
 extract >> upload_file >> read >> transform >> load
