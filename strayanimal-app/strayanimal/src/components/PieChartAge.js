@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
 import Chart from 'chart.js/auto';
 import { useQuery} from "@tanstack/react-query";
@@ -7,7 +8,7 @@ import Loading from "./Loading.js";
 
 function PieChartAge(params) {
     const chartRef = useRef(null);
-    const {status, data, error} = useQuery(["strayanimal", "casePerAgeData"], async () => {
+    const {status, data} = useQuery(["strayanimal", "casePerAgeData"], async () => {
         const docSnap = await getDoc(doc(db, "strayanimal", "차트10_연령대_별_유기_발생_비율"));
         return docSnap.data().data;
     })

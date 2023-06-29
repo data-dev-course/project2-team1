@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useRef } from "react";
 import Chart from 'chart.js/auto';
 import { useQuery} from "@tanstack/react-query";
@@ -104,7 +105,7 @@ function EndStateChart(params) {
         })
     }
     const [doughnutData, setDoughnutData] = useState(null);
-    const {status, data, error} = useQuery(["strayanimal, endstate"], async ( )=> {
+    const {status, data} = useQuery(["strayanimal, endstate"], async ( )=> {
         const colref = collection(db, "strayanimal");
         const q = await getDocs(query(colref, where(documentId(), "in", ['차트03_보호_종료_시_상태_비율', '차트04_60일_보호_종료_상태_비율', '차트06_유기건수_축종_내_보호_종료_후_상태'])))
         const docList = q.docs.map((doc) => {

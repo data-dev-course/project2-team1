@@ -24,7 +24,7 @@ function colorize(opaque) {
 
 function BarChartIncome() {
     const chartRef = useRef(null);
-    const {status, data, error} = useQuery(["strayanimal", "incomerelated"], async () => {
+    const {status, data} = useQuery(["strayanimal", "incomerelated"], async () => {
         const docSnap = await getDoc(doc(db, "strayanimal", "차트09_지역별_소득수준_및_유기건수"));
         return docSnap.data().data;
     })
