@@ -9,7 +9,7 @@ import {TreemapController, TreemapElement} from 'chartjs-chart-treemap';
 function TreeMapKind() {
     const chartRef = useRef(null);
     const [selectViewType, setSelectViewType] = useState("staryCnt")
-    const {status, data, error} = useQuery(["strayanimal", "animalkindmap"], async ()=> {
+    const {status, data} = useQuery(["strayanimal", "animalkindmap"], async ()=> {
         const docSnap = await getDoc(doc(db, "strayanimal", "차트11_품종_견묘_등록_유기_비율"));
         return docSnap.data().data;
     })
@@ -104,9 +104,8 @@ function TreeMapKind() {
                       label(item) {
                         const dataItem = item.raw;
                         const obj = dataItem._data;
-                          const label = obj.kindSpcs || obj.kindCd;
-                          return label + ': ' + dataItem.v;
-                        return;
+                        const label = obj.kindSpcs || obj.kindCd;
+                        return label + ': ' + dataItem.v;
                       }
                     }
                   }
