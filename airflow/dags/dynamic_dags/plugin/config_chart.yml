@@ -1,0 +1,141 @@
+chart_data:
+  - chart_name: "차트01_어제의_유기숫자"
+    chart_num: "chart_01"
+    query: "
+    SELECT count(*) AS cnt
+    FROM raw_data.animal_info
+    WHERE happenDt in (SELECT  happenDt 
+        FROM raw_data.animal_info
+        ORDER BY happenDt DESC
+        limit 1 )
+    "
+  - chart_name: "차트02_보호중인_유기동물_마리수"
+    chart_num: "chart_02"
+    query: "
+    SELECT count(processState) as cnt
+    FROM `strayanimal.raw_data.animal_info`
+    WHERE processState = '보호중'
+        AND happenDt >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)
+    "
+  - chart_name: "차트03_보호_종료_시_상태_비율"
+    chart_num: "chart_03"
+    query: "
+    SELECT endState AS endState, COUNT(*) AS count
+    FROM analytics.animal_analytics
+    WHERE endState IS NOT NULL
+        GROUP BY endState
+        ORDER BY count DESC
+    "
+  - chart_name: "차트04_60일_보호_종료_상태_비율"
+    chart_num: "chart_04"
+    query: "
+    WITH count_by_it60Day AS (
+    SELECT lt60Day, endState,COUNT(*) AS count
+    FROM `analytics.animal_analytics`
+    WHERE lt60Day IS NOT NULL AND endState IS NOT NULL
+    GROUP BY lt60Day, endState
+    )
+    SELECT a.lt60Day, a.endState, a.count,ROUND((a.count / b.count_by_it60Day) * 100, 2) AS percentage
+    FROM count_by_it60Day a
+    JOIN (SELECT lt60Day, SUM(count) AS count_by_it60Day FROM count_by_it60Day GROUP BY lt60Day) b
+        ON a.lt60Day = b.lt60Day
+    ORDER BY a.lt60Day
+    "
+  - chart_name: "차트05_지역별_보호_종료_상태_비율"
+    chart_num: "chart_05"
+    query: "
+    SELECT orgNm, endState, COUNT(*) AS count,
+    FROM `analytics`.`animal_analytics`
+    WHERE `endState` IS NOT NULL
+    GROUP BY orgNm, endState
+    ORDER BY count DESC
+    "
+  - chart_name: "차트06_유기건수_축종_내_보호_종료_후_상태"
+    chart_num: "chart_06"
+    query: "
+    SELECT kindCd, endState, COUNT(*) AS count
+    FROM `analytics.animal_analytics`
+    WHERE `endState` IS NOT NULL
+    GROUP BY kindCd, endState
+    ORDER BY count DESC
+    " 
+  - chart_name: "차트07_분기별_유기발생_건수"
+    chart_num: "chart_07"
+    query: "
+    SELECT format_date('%Y', happenDt) AS `year`, format_date('%Q', happenDt) AS `quarter`, COUNT(*) AS `count`
+    FROM `analytics.animal_analytics`
+    GROUP BY `year`,`quarter`
+    ORDER BY count DESC
+    "
+  - chart_name: "차트08_모든_날짜별_분기별_지역별_유기동물_발생_횟수"
+    chart_num: "chart_08"
+    query: "
+    SELECT 
+    CASE 
+    WHEN orgNm LIKE '% %' THEN TRIM(SUBSTR(orgNm, 1, INSTR(orgNm, ' '))) ELSE orgNm 
+    END AS name, 
+    count(*) AS `count`
+    FROM
+    (WITH A AS
+    (SELECT *, TRIM(SUBSTR(orgNm, 1, INSTR(orgNm, ' '))) AS extracted
+    FROM `strayanimal.analytics.animal_analytics`)
+    SELECT *
+    FROM A LEFT JOIN `strayanimal.raw_data.iso_kr` B ON A.extracted = B.name) AS `virtual_table`
+    GROUP BY `name`
+    "
+  - chart_name: "차트09_지역별_소득수준_및_유기건수"
+    chart_num: "chart_09"
+    query: "
+    SELECT *
+    FROM `analytics.case_count_with_income_Top10`
+    "
+  - chart_name: "차트10_연령대_별_유기_발생_비율"
+    chart_num: 'chart_10'
+    query: "
+    SELECT age, ageCount, ROUND(ageCount / SUM(ageCount) OVER(),3) as agePercent
+    FROM
+    (
+        SELECT age, count(age) as ageCount
+        FROM analytics.animal_analytics A 
+        GROUP BY age
+        HAVING (COUNT(*))>2
+    )
+    ORDER BY ageCount DESC
+    "
+  - chart_name: "차트11_품종_견묘_등록_유기_비율"
+    chart_num: "chart_11"
+    query: "
+    SELECT age, ageCount, ROUND(ageCount / SUM(ageCount) OVER(),3) as agePercent
+    FROM
+    (
+        SELECT age, count(age) as ageCount
+        FROM analytics.animal_analytics A 
+        GROUP BY age
+        HAVING (COUNT(*))>2
+    )
+    ORDER BY ageCount DESC
+    "
+  - chart_name: "차트12_유기동물_상세정보_고양이"
+    chart_num: "chart_12_cat"
+    query: "
+    SELECT A.desertionNo, A.happenDt, B.popfile, A.kindCd, A.kindSpcs,
+    A.colorCd, A.age, A.weight, A.sexCd, A.specialMark, A.careNm, A.careAddr
+    FROM analytics.animal_analytics A 
+    JOIN `raw_data.animal_info` B ON A.desertionNo = B.desertionNo
+    WHERE 
+    A.processState = '보호중'
+    AND A.happenDt >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)
+    AND A.kindCd ='고양이'
+    "
+  - chart_name: "차트12_유기동물_상세정보_개"
+    chart_num: "chart_12_dog"
+    query: "
+    SELECT A.desertionNo, A.happenDt, B.popfile, A.kindCd, A.kindSpcs,
+    A.colorCd, A.age, A.weight, A.sexCd, A.specialMark, A.careNm, A.careAddr
+    FROM analytics.animal_analytics A 
+    JOIN `raw_data.animal_info` B ON A.desertionNo = B.desertionNo
+    WHERE 
+    A.processState = '보호중'
+    AND A.happenDt >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)
+    AND A.kindCd ='개'
+    "
