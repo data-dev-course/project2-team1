@@ -200,16 +200,26 @@ def load_to_bigquery(**context):
     temp_table_id = "quarter_temp"
     df = context["ti"].xcom_pull(task_ids="transform_data")
 
-    # BigQuery 클라이언트 인스턴스 생성
-    bigquery_client = bigquery.Client()
-
     # 데이터프레임을 로드할 테이블 경로 설정
     table_path = f"{project_id}.{dataset_id}.{table_id}"
     temp_table_path = f"{project_id}.{dataset_id}.{temp_table_id}"
-
-    # 테이블 존재 여부 확인
+    
+    # 이전 작업을 위한 백업 테이블명
+    backup_table_id = "backup_table"
+    
+    # BigQuery 클라이언트 인스턴스 생성
+    bigquery_client = bigquery.Client()
 
     try:
+        # 이전 작업을 위해 원본 테이블을 백업
+        backup_table_ref = bigquery_client.copy_table(table_path, backup_table_id)
+    except:
+        # 백업 실패 시 처리할 예외 처리 로직 작성
+        pass
+    
+
+    try:
+        # 테이블 존재 여부 확인
         bigquery_client.get_table(table_path)
         table_exists = True
     except:
@@ -224,30 +234,38 @@ def load_to_bigquery(**context):
         )
     else:
         table_ref = bigquery_client.get_table(table_path)
+    
+    try:
+        # 데이터프레임을 임시 테이블로 저장
+        job_config = bigquery.LoadJobConfig(schema=bigquery_schema)
+        job = bigquery_client.load_table_from_dataframe(df, temp_table_path, job_config=job_config)
+        job.result()  # Job 실행 완료 대기
 
-    # 데이터프레임을 임시 테이블로 저장
-    job_config = bigquery.LoadJobConfig(schema=bigquery_schema)
-    job = bigquery_client.load_table_from_dataframe(
-        df, temp_table_path, job_config=job_config
-    )
-    job.result()  # Job 실행 완료 대기
+        # 임시 테이블의 데이터를 대상 테이블로 삽입 (중복 제거됨)
+        query = f"""
+            INSERT INTO {table_path}
+            SELECT t.*
+            FROM {temp_table_path} AS t
+            EXCEPT DISTINCT
+            SELECT *
+            FROM {table_path}
+        """
+        job = bigquery_client.query(query)
+        job.result()  # Job 실행 완료 대기
 
-    # 임시 테이블의 데이터를 대상 테이블로 삽입 (중복 제거됨)
-    query = f"""
-        INSERT INTO {table_path}
-        SELECT t.*
-        FROM {temp_table_path} AS t
-        EXCEPT DISTINCT
-        SELECT *
-        FROM {table_path}
-    """
-    job = bigquery_client.query(query)
-    job.result()  # Job 실행 완료 대기
+        # 임시 테이블 삭제
+        bigquery_client.delete_table(temp_table_path)
+        
+        print('success')
+    except:
+        # 작업 실패 시 이전 상태로 복구
+        bigquery_client.copy_table(backup_table_ref, table_path)
+        
+        # 실패한 작업으로 인해 생성된 임시 테이블을 삭제
+        bigquery_client.delete_table(temp_table_path)
+        
+        print('failed')
 
-    # 임시 테이블 삭제
-    bigquery_client.delete_table(temp_table_path)
-
-    print("succes")
 
 
 extract = PythonOperator(
