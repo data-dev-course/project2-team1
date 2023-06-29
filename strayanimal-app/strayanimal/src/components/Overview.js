@@ -8,7 +8,7 @@ import { collection, getDocs, query, where, documentId } from "firebase/firestor
 import BarChartLoc from "./BarChartLoc";
 import BarChartIncome from "./BarChartIncome";
 import PieChartAge from "./PieChartAge";
-import KoreaMap from "./koreamap";
+import KoreaMap from "./KoreaMap";
 import TreeMapKind from "./TreeMapKind";
 
 function PieChartView(params) {
@@ -46,7 +46,7 @@ function NumberHighlightChart(params) {
     }
     useEffect(()=>{
         counterFunc(0, params.num);
-    },[])
+    },[params.num])
     return (
         <div className="number-highlight-chart vertical">
             <div className="highlight-title">{params.title} <i className="fa-solid fa-feather fa-lg" style={{color: "#ffffff", padding:" 0 4px"}}></i></div>
@@ -62,7 +62,7 @@ function NumberHighlightChart(params) {
 }
 
 function Overview(params) {
-    const { status, data, error } = useQuery(["strayanimal", "chart-overview"], async () => {
+    const { status, data } = useQuery(["strayanimal", "chart-overview"], async () => {
         const colref = collection(db, "strayanimal");
         const q = await getDocs(query(colref, where(documentId(), "in", ['차트01_어제의_유기숫자', '차트02_보호중인_유기동물_마리수'])))
         const docList = q.docs.map((doc) => {

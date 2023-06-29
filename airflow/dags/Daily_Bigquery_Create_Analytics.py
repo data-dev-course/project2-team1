@@ -8,7 +8,7 @@ from datetime import datetime
 
 excute_sql = """
     SELECT 
-    desertionNo,
+    DISTINCT(desertionNo),
     happenDt,
     happenPlace,
     REGEXP_EXTRACT(kindCd, r'\[(.*?)\]') AS kindCd, 
@@ -61,7 +61,7 @@ with DAG(
 ) as dag:
     bigquery_create_analytics_table = BigQueryExecuteQueryOperator(
         task_id="excute_query",
-        gcp_conn_id="bigquery_connection",
+        gcp_conn_id="gcp_conn_service",
         # 레거시SQL(true) 또는 표준SQL(false) 사용여부
         use_legacy_sql=False,
         # 쿼리 결과 저장 설적
