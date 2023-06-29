@@ -199,6 +199,7 @@ def load_to_bigquery(**context):
     table_id = context["params"]["table_id"]
     temp_table_id = "temp_daily"
     df = context["ti"].xcom_pull(task_ids="transform_data")
+    backup_table_id = "backup_table"
 
     # BigQuery 클라이언트 인스턴스 생성
     bigquery_client = bigquery.Client()
