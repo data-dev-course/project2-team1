@@ -80,8 +80,8 @@ def extract_data_OpenAPI(**context):
                 print(today_HM, "성공 데이터 :", result_df.shape[0])
                 break
         except Exception as e:
-            if e == 'item':
-                print(today_HM + '기준', '등록된 유기동물 데이터가 없습니다.')
+            if e == "item":
+                print(today_HM + "기준", "등록된 유기동물 데이터가 없습니다.")
                 break
             print(today_HM, "error :", e)
     else:
