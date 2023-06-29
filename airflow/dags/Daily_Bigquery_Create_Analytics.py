@@ -1,7 +1,5 @@
 from airflow import DAG
-from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryExecuteQueryOperator,
-)
+from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
 from datetime import datetime
@@ -61,7 +59,7 @@ with DAG(
 ) as dag:
     bigquery_create_analytics_table = BigQueryExecuteQueryOperator(
         task_id="excute_query",
-        gcp_conn_id="bigquery_connection",
+        gcp_conn_id="gcp_conn_service",
         # 레거시SQL(true) 또는 표준SQL(false) 사용여부
         use_legacy_sql=False,
         # 쿼리 결과 저장 설적
@@ -74,6 +72,7 @@ with DAG(
     trigger = TriggerDagRunOperator(
         task_id="trigger",
         trigger_dag_id="Daily_Bigquery_to_Firestore_chart_01",
+
         wait_for_completion=False,
         poke_interval=30,
         allowed_states=["success"],
