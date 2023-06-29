@@ -55,8 +55,8 @@ jobs:
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
-          name: dist
-          path: dist
+          name: build
+          path: ${{ github.workspace }}/strayanimal
   deploy:
     if: github.event.pull_request.merged == true
     needs: build
@@ -70,8 +70,8 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@master
         with:
-          name: dist
-          path: dist
+          name: build
+          path: ${{ github.workspace }}/strayanimal
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.TOKEN }}"
