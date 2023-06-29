@@ -166,52 +166,49 @@ def transform_data(**context):
 
 def load_to_bigquery(**context):
     bigquery_schema = [
-            bigquery.SchemaField("desertionNo","INTEGER"),
-            bigquery.SchemaField("filename","STRING"),
-            bigquery.SchemaField("happenDt","TIMESTAMP"),    
-            bigquery.SchemaField("happenPlace","STRING"),    
-            bigquery.SchemaField("kindCd","STRING"),    
-            bigquery.SchemaField("colorCd","STRING"),    
-            bigquery.SchemaField("age","STRING"),    
-            bigquery.SchemaField("weight","STRING"),    
-            bigquery.SchemaField("noticeNo","STRING"),    
-            bigquery.SchemaField("noticeSdt","TIMESTAMP"),    
-            bigquery.SchemaField("noticeEdt","TIMESTAMP"),    
-            bigquery.SchemaField("popfile","STRING"),    
-            bigquery.SchemaField("processState","STRING"),    
-            bigquery.SchemaField("sexCd","STRING"),    
-            bigquery.SchemaField("neuterYn","STRING"),    
-            bigquery.SchemaField("specialMark","STRING"),    
-            bigquery.SchemaField("careNm","STRING"),    
-            bigquery.SchemaField("careTel","STRING"),    
-            bigquery.SchemaField("careAddr","STRING"),    
-            bigquery.SchemaField("orgNm","STRING"),    
-            bigquery.SchemaField("chargeNm","STRING"),    
-            bigquery.SchemaField("officetel","STRING"),    
-            bigquery.SchemaField("noticeComment","STRING"),    
-            bigquery.SchemaField("created_date","TIMESTAMP")         
-        ] 
+        bigquery.SchemaField("desertionNo", "INTEGER"),
+        bigquery.SchemaField("filename", "STRING"),
+        bigquery.SchemaField("happenDt", "TIMESTAMP"),
+        bigquery.SchemaField("happenPlace", "STRING"),
+        bigquery.SchemaField("kindCd", "STRING"),
+        bigquery.SchemaField("colorCd", "STRING"),
+        bigquery.SchemaField("age", "STRING"),
+        bigquery.SchemaField("weight", "STRING"),
+        bigquery.SchemaField("noticeNo", "STRING"),
+        bigquery.SchemaField("noticeSdt", "TIMESTAMP"),
+        bigquery.SchemaField("noticeEdt", "TIMESTAMP"),
+        bigquery.SchemaField("popfile", "STRING"),
+        bigquery.SchemaField("processState", "STRING"),
+        bigquery.SchemaField("sexCd", "STRING"),
+        bigquery.SchemaField("neuterYn", "STRING"),
+        bigquery.SchemaField("specialMark", "STRING"),
+        bigquery.SchemaField("careNm", "STRING"),
+        bigquery.SchemaField("careTel", "STRING"),
+        bigquery.SchemaField("careAddr", "STRING"),
+        bigquery.SchemaField("orgNm", "STRING"),
+        bigquery.SchemaField("chargeNm", "STRING"),
+        bigquery.SchemaField("officetel", "STRING"),
+        bigquery.SchemaField("noticeComment", "STRING"),
+        bigquery.SchemaField("created_date", "TIMESTAMP"),
+    ]
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(
-    os.environ["AIRFLOW_HOME"], "keys", "load_to_bigquery_raw_data.json"
+        os.environ["AIRFLOW_HOME"], "keys", "load_to_bigquery_raw_data.json"
     )
     project_id = context["params"]["project_id"]
     dataset_id = context["params"]["dataset_id"]
     table_id = context["params"]["table_id"]
-    temp_table_id = 'quarter_temp'
-    df = context["ti"].xcom_pull(
-        task_ids="transform_data"
-    )
-    
-    
+    temp_table_id = "quarter_temp"
+    df = context["ti"].xcom_pull(task_ids="transform_data")
+
     # BigQuery 클라이언트 인스턴스 생성
     bigquery_client = bigquery.Client()
 
     # 데이터프레임을 로드할 테이블 경로 설정
-    table_path = f'{project_id}.{dataset_id}.{table_id}'
-    temp_table_path = f'{project_id}.{dataset_id}.{temp_table_id}'
-    
+    table_path = f"{project_id}.{dataset_id}.{table_id}"
+    temp_table_path = f"{project_id}.{dataset_id}.{temp_table_id}"
+
     # 테이블 존재 여부 확인
-    
+
     try:
         bigquery_client.get_table(table_path)
         table_exists = True
@@ -222,13 +219,17 @@ def load_to_bigquery(**context):
     # 테이블가 존재하지 않는 경우에만 새로운 테이블 생성
     if not table_exists:
         schema = bigquery_schema
-        table_ref = bigquery_client.create_table(bigquery.Table(table_path, schema=schema))
+        table_ref = bigquery_client.create_table(
+            bigquery.Table(table_path, schema=schema)
+        )
     else:
         table_ref = bigquery_client.get_table(table_path)
-    
+
     # 데이터프레임을 임시 테이블로 저장
     job_config = bigquery.LoadJobConfig(schema=bigquery_schema)
-    job = bigquery_client.load_table_from_dataframe(df, temp_table_path, job_config=job_config)
+    job = bigquery_client.load_table_from_dataframe(
+        df, temp_table_path, job_config=job_config
+    )
     job.result()  # Job 실행 완료 대기
 
     # 임시 테이블의 데이터를 대상 테이블로 삽입 (중복 제거됨)
@@ -245,8 +246,8 @@ def load_to_bigquery(**context):
 
     # 임시 테이블 삭제
     bigquery_client.delete_table(temp_table_path)
-    
-    print('succes')
+
+    print("succes")
 
 
 extract = PythonOperator(
