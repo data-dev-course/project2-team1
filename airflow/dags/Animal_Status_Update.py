@@ -132,7 +132,7 @@ def update_data_bigquery(file_df):
 
 with DAG(
     dag_id=DAG_ID,
-    schedule="5 15 * * *",
+    schedule="5 0 * * *",
     start_date=datetime(2023, 6, 27),
     catchup=False,
     default_args=default_args,
