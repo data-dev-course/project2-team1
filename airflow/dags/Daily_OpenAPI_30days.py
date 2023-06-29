@@ -197,25 +197,24 @@ def load_to_bigquery(**context):
     project_id = context["params"]["project_id"]
     dataset_id = context["params"]["dataset_id"]
     table_id = context["params"]["table_id"]
-    temp_table_id = "temp_daily"
+    temp_table_id = "quarter_temp"
     df = context["ti"].xcom_pull(task_ids="transform_data")
-    backup_table_id = "backup_table"
-
-    # BigQuery 클라이언트 인스턴스 생성
-    bigquery_client = bigquery.Client()
 
     # 데이터프레임을 로드할 테이블 경로 설정
     table_path = f"{project_id}.{dataset_id}.{table_id}"
     temp_table_path = f"{project_id}.{dataset_id}.{temp_table_id}"
+
+    # 이전 작업을 위한 백업 테이블명
+    backup_table_id = "backup_table"
+
+    # BigQuery 클라이언트 인스턴스 생성
+    bigquery_client = bigquery.Client()
 
     try:
         # 이전 작업을 위해 원본 테이블을 백업
         backup_table_ref = bigquery_client.copy_table(table_path, backup_table_id)
     except:
         # 백업 실패 시 처리할 예외 처리 로직 작성
-
-        ### slack 봇 알림가기 ###
-
         pass
 
     try:
@@ -265,8 +264,6 @@ def load_to_bigquery(**context):
 
         # 실패한 작업으로 인해 생성된 임시 테이블을 삭제
         bigquery_client.delete_table(temp_table_path)
-
-        ### slack 봇 알림가기 ###
 
         print("failed")
 
