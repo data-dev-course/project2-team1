@@ -5,6 +5,8 @@ on:
   pull_request:
     types:
       - closed
+    branches-ignore:
+      - 'actions/black'
     branches:
       - 'main'
       - 'develop'
@@ -18,13 +20,12 @@ env:
 
 jobs:
   update-dags:
-    if: github.event.pull_request.merged
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./airflow
     steps:
-
     - name: Checkout airflow folder
       uses: actions/checkout@v3
       with: 
@@ -48,7 +49,13 @@ jobs:
         echo "${{ secrets.GCP_PRIVATE_SSH_KEY }}">>google_compute_engine
         echo "${{ secrets.GCP_PUBLIC_SSH_KEY }}">>google_compute_engine.pub
         chmod 400 google_compute_engine
-
+    
+    - name: 'remove /tmp/airflow'
+      run: gcloud compute ssh ${{ env.GCE_INSTANCE }}
+        --zone=${{ env.GCE_INSTANCE_ZONE }}
+        --project=${{ env.PROJECT_ID }}
+        --command="rm -rf /tmp/airflow"
+    
     - name: 'Copy Github airflow folder to tmp: SCP'    
       run: gcloud compute scp 
         --zone=${{ env.GCE_INSTANCE_ZONE }}
