@@ -197,7 +197,7 @@ def load_to_bigquery(**context):
     project_id = context["params"]["project_id"]
     dataset_id = context["params"]["dataset_id"]
     table_id = context["params"]["table_id"]
-    temp_table_id = "quarter_temp"
+    temp_table_id = "temp_daily"
     df = context["ti"].xcom_pull(task_ids="transform_data")
 
     # BigQuery 클라이언트 인스턴스 생성
