@@ -1,5 +1,7 @@
 from airflow import DAG
-from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
+from airflow.providers.google.cloud.operators.bigquery import (
+    BigQueryExecuteQueryOperator,
+)
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
 from datetime import datetime
