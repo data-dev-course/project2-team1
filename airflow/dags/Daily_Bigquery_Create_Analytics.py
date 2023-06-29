@@ -51,7 +51,7 @@ excute_sql = """
     """
 
 with DAG(
-    dag_id="bigquery_transform",
+    dag_id="Daily_Bigquery_Create_Analytics",
     start_date=datetime(2023, 6, 26),
     schedule="20 15 * * *",
     max_active_runs=1,
