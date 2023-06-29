@@ -11,7 +11,7 @@ on:
 
 jobs:
   deploy_live_website:
-    if: github.event.pull_request.merged
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -23,7 +23,10 @@ jobs:
           sparse-checkout: 'strayanimal-app'
             
       - name: 'Build Application'
-        run: npm ci && npm run build
+        run: |
+          cd strayanimal && npm ci
+          cd ..
+          npm ci && npm run build
       
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:

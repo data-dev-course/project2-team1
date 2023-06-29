@@ -5,6 +5,8 @@ on:
   pull_request:
     types:
       - closed
+    branches-ignore:
+      - 'actions/black'
     branches:
       - 'main'
       - 'develop'
@@ -18,13 +20,12 @@ env:
 
 jobs:
   update-dags:
-    if: github.event.pull_request.merged
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./airflow
     steps:
-
     - name: Checkout airflow folder
       uses: actions/checkout@v3
       with: 
