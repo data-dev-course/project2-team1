@@ -12,13 +12,13 @@ import {
 } from "firebase/firestore";
 
 export const getTotalDoc = async (kindType='개') => {
-    const collref = collection(db, "test_collection", "차트12_유기동물_상세정보", `차트12_유기동물_상세정보_${kindType}`);
+    const collref = collection(db, "strayanimal", "차트12_유기동물_상세정보", `차트12_유기동물_상세정보_${kindType}`);
     const snapshot = await getCountFromServer(collref);
     return snapshot.data().count;
 }
 
 export const fetchPostData = async (pageParam=0, kindType='개', lastSnap, last=true) => {
-    const collref = collection(db, "test_collection", "차트12_유기동물_상세정보", `차트12_유기동물_상세정보_${kindType}`);
+    const collref = collection(db, "strayanimal", "차트12_유기동물_상세정보", `차트12_유기동물_상세정보_${kindType}`);
     let q;
     
     if (pageParam === 0) {
