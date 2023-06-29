@@ -168,15 +168,15 @@ def load_to_bigquery(**context):
     bigquery_schema = [
         bigquery.SchemaField("desertionNo", "INTEGER"),
         bigquery.SchemaField("filename", "STRING"),
-        bigquery.SchemaField("happenDt", "TIMESTAMP"),
+        bigquery.SchemaField("happenDt", "DATETIME"),
         bigquery.SchemaField("happenPlace", "STRING"),
         bigquery.SchemaField("kindCd", "STRING"),
         bigquery.SchemaField("colorCd", "STRING"),
         bigquery.SchemaField("age", "STRING"),
         bigquery.SchemaField("weight", "STRING"),
         bigquery.SchemaField("noticeNo", "STRING"),
-        bigquery.SchemaField("noticeSdt", "TIMESTAMP"),
-        bigquery.SchemaField("noticeEdt", "TIMESTAMP"),
+        bigquery.SchemaField("noticeSdt", "DATETIME"),
+        bigquery.SchemaField("noticeEdt", "DATETIME"),
         bigquery.SchemaField("popfile", "STRING"),
         bigquery.SchemaField("processState", "STRING"),
         bigquery.SchemaField("sexCd", "STRING"),
@@ -189,7 +189,7 @@ def load_to_bigquery(**context):
         bigquery.SchemaField("chargeNm", "STRING"),
         bigquery.SchemaField("officetel", "STRING"),
         bigquery.SchemaField("noticeComment", "STRING"),
-        bigquery.SchemaField("created_date", "TIMESTAMP"),
+        bigquery.SchemaField("created_date", "DATETIME"),
     ]
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(
         os.environ["AIRFLOW_HOME"], "keys", "load_to_bigquery_raw_data.json"
