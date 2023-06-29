@@ -2,7 +2,7 @@ name: Format code
 
 on:
   push:
-    branches: [ develop ]
+    branches: [develop]
 
 jobs:
   format:
@@ -12,10 +12,8 @@ jobs:
       - name: Format code with black
         run: |
           pip install black
-          # < black . > 는 .py 로 끝나는 모든 파일을 확인한다는 명령어
           black .
           git config user.name ${{ github.actor }}
           git config user.email ${{ github.actor }}@users.noreply.github.com
           git add .
-          git commit -m "Format code with black"
-          git push
+          git diff --quiet --exit-code || git commit -m "Format code with black" && git push
