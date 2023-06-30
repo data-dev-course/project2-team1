@@ -126,6 +126,7 @@ def extract_data_OpenAPI():
             "orgNm",
             "chargeNm",
             "officetel",
+            "noticeComment",
         ]
     )
 
