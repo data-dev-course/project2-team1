@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from airflow import DAG
-from airflow.macros import *
 from airflow.operators.bash import BashOperator
 
 Dag_id = "Clean_data_log"

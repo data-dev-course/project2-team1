@@ -250,7 +250,7 @@ def load_to_bigquery(**context):
         bigquery_client.get_table(table_path)
         print(f"{table_path} 테이블 존재")
         table_exists = True
-    except:
+    except Exception as e:
         print(f"{table_path} 테이블 존재하지 않음")
         table_exists = False
         pass
@@ -258,11 +258,11 @@ def load_to_bigquery(**context):
     # 테이블가 존재하지 않는 경우에만 새로운 테이블 생성
     if not table_exists:
         schema = bigquery_schema
-        table_ref = bigquery_client.create_table(
+        bigquery_client.create_table(
             bigquery.Table(table_path, schema=schema)
         )
     else:
-        table_ref = bigquery_client.get_table(table_path)
+        bigquery_client.get_table(table_path)
 
     try:
         # 데이터프레임을 임시 테이블로 저장
