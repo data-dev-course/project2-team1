@@ -44,32 +44,39 @@ async def fetch(client, params):
 
 async def request_OpenAPI(date, params, MAX_RETRIES=10):
     for _ in range(MAX_RETRIES):
-        params['bgnde'] = date
-        params['endde'] = date
+        params["bgnde"] = date
+        params["endde"] = date
         try:
             async with aiohttp.ClientSession() as client:
                 res = await fetch(client, params)
-                
-            if 'SERVICE_KEY_IS_NOT_REGISTERED_ERROR' in res:
-                raise Exception('공공데이터 OpenAPI Server error: SERVICE_KEY_IS_NOT_REGISTERED_ERROR -> 등록되지 않은 서비스키')
+
+            if "SERVICE_KEY_IS_NOT_REGISTERED_ERROR" in res:
+                raise Exception(
+                    "공공데이터 OpenAPI Server error: SERVICE_KEY_IS_NOT_REGISTERED_ERROR -> 등록되지 않은 서비스키"
+                )
             else:
-                df_dailydata = pd.DataFrame(json.loads(res)['response']['body']['items']['item']) # daily data json -> df
-                print(date, '성공 데이터 :', df_dailydata.shape[0])
+                df_dailydata = pd.DataFrame(
+                    json.loads(res)["response"]["body"]["items"]["item"]
+                )  # daily data json -> df
+                print(date, "성공 데이터 :", df_dailydata.shape[0])
                 break
         except Exception as e:
             print(date, "error :", e)
     else:
-        print(date, '10회 이상 추출 실패, OpenAPI 서버 문제로 추출 중단')
+        print(date, "10회 이상 추출 실패, OpenAPI 서버 문제로 추출 중단")
         return None
-    
+
     return df_dailydata
 
 
-
 def extract_data_OpenAPI():
-    params ={'serviceKey' : OPENAPI_KEY,
-        'bgnde' : 'yyyymmdd', 'endde' : 'yyyymmdd',
-        'numOfRows' : '1000', '_type' : 'json' }
+    params = {
+        "serviceKey": OPENAPI_KEY,
+        "bgnde": "yyyymmdd",
+        "endde": "yyyymmdd",
+        "numOfRows": "1000",
+        "_type": "json",
+    }
 
     today = datetime.now(timezone("Asia/Seoul")).strftime("%Y-%m-%d")
     before_one_month = (
@@ -79,26 +86,49 @@ def extract_data_OpenAPI():
 
     # 현재 실행 중인 스레드의 이벤트 루프를 가져옵니다. 만약 이벤트 루프가 없다면 새로운 이벤트 루프를 생성
     loop = asyncio.get_event_loop()
-    
+
     # 각각의 request_OpenAPI() 호출을 리스트 컴프리헨션을 사용하여 생성
     futures = [request_OpenAPI(date, params) for date in dates]
-    
+
     # asyncio.gather()를 사용하여 모든 Future 객체를 묶은 후, 현재 이벤트 루프를 사용하여 병렬로 실행
     # loop.run_until_complete()를 사용하여 병렬 실행이 완료될 때까지 기다립니다.
     results = loop.run_until_complete(asyncio.gather(*futures))
 
     # 이벤트 루프를 종료
     loop.close()
-    
+
     SAVE_NAME = "strayanimal_data_" + dates[-1] + ".csv"
     LOCAL_PATH_NAME = os.path.join(
         os.environ["AIRFLOW_HOME"], "data", "strayanimal_30days_data", SAVE_NAME
     )
-    
-    result_df = pd.DataFrame(columns=['desertionNo','filename','happenDt','happenPlace','kindCd','colorCd','age',
-                            'weight','noticeNo','noticeSdt','noticeEdt','popfile','processState','sexCd',
-                            'neuterYn','specialMark','careNm','careTel','careAddr','orgNm', 'chargeNm', 'officetel'])
-    
+
+    result_df = pd.DataFrame(
+        columns=[
+            "desertionNo",
+            "filename",
+            "happenDt",
+            "happenPlace",
+            "kindCd",
+            "colorCd",
+            "age",
+            "weight",
+            "noticeNo",
+            "noticeSdt",
+            "noticeEdt",
+            "popfile",
+            "processState",
+            "sexCd",
+            "neuterYn",
+            "specialMark",
+            "careNm",
+            "careTel",
+            "careAddr",
+            "orgNm",
+            "chargeNm",
+            "officetel",
+        ]
+    )
+
     for df_dailydata in results:
         if df_dailydata is None:
             raise AirflowException("10회 이상 추출 실패 데이터, OpenAPI 서버 문제로 추출 중단")
@@ -107,9 +137,7 @@ def extract_data_OpenAPI():
     else:
         result_df.to_csv(LOCAL_PATH_NAME, encoding="utf-8-sig")
 
-
     return SAVE_NAME, LOCAL_PATH_NAME
-
 
 
 def upload_data_GCS(**context):
