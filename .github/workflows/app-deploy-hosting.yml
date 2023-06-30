@@ -6,6 +6,7 @@ on:
       - closed
     branches:
       - main
+      - develop
     paths:
       - "strayanimal-app/**"
 
@@ -52,6 +53,13 @@ jobs:
           cd strayanimal && npm ci
           cd ..
           npm ci && npm run build
+
+      - run: npm test
+
+      - run: |
+          ls -al
+          pwd
+
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
