@@ -1,10 +1,10 @@
+from datetime import datetime
+
 from airflow import DAG
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryExecuteQueryOperator,
 )
-from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-
-from datetime import datetime
 
 default_args = {
     "owner": "ih-tjpark",

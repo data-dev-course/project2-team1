@@ -1,22 +1,20 @@
-from airflow import DAG
-from airflow.macros import *
-from airflow.operators.python import PythonOperator
-from airflow.exceptions import AirflowException
-from airflow.models import Variable
-
-
 import io
-import os
 import json
-import requests
+import os
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
-from datetime import datetime
+import requests
+from airflow import DAG
+from airflow.exceptions import AirflowException
+from airflow.macros import *
+from airflow.models import Variable
+from airflow.operators.python import PythonOperator
+from google.cloud import bigquery, storage
 from pytz import timezone
-from google.cloud import storage
-from google.cloud import bigquery
-from plugins import slack
 
+from plugins import slack
 
 DAG_ID = "Quarter_OpenAPI_today"
 dag = DAG(

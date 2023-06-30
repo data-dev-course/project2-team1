@@ -1,18 +1,16 @@
-from airflow.models import DAG
-from airflow.macros import *
-from airflow.decorators import task
-from airflow.operators.dummy_operator import DummyOperator
-from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
-from airflow.providers.google.cloud.sensors.gcs import GCSObjectExistenceSensor
-
-from google.cloud import storage
-from google.cloud import bigquery
-
 import io
-from dateutil.relativedelta import relativedelta
 from datetime import datetime
-from pendulum import duration
+
 import pandas as pd
+from airflow.decorators import task
+from airflow.macros import *
+from airflow.models import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from airflow.providers.google.cloud.sensors.gcs import GCSObjectExistenceSensor
+from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
+from dateutil.relativedelta import relativedelta
+from google.cloud import bigquery, storage
+from pendulum import duration
 
 PROJECT_ID = "strayanimal"
 BEFORE_ONE_DAY = (datetime.now() - relativedelta(days=1)).strftime("%Y%m%d")

@@ -1,21 +1,17 @@
 name: Firebase Webapp Deploy Hosting
   
 on:
-  push:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
     paths:
       - "strayanimal-app/**"
-  #pull_request:
-  #  types:
-  #    - closed
-  #  branches:
-  #    - main
-  #    - develop
-  #  paths:
-  #    - "strayanimal-app/**"
 
 jobs:
-  build_deploy:
-    #if#: github.event.pull_request.merged == true
+  test_build_deploy:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: firebase
     defaults:
@@ -56,12 +52,9 @@ jobs:
           cd strayanimal && npm ci
           cd ..
           npm ci && npm run build
-
-      - run: npm test
-
-      - run: |
-          ls -al
-          pwd
+      
+      - name: 'Jest Testing w/ coverage'
+        run: npm test
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -69,3 +62,4 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_STRAYANIMAL }}"
           projectId: strayanimal
           channelId: live
+          entryPoint: /home/runner/work/project2-team1/project2-team1/strayanimal-app
