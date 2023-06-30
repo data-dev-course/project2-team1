@@ -5,7 +5,7 @@ from airflow.operators.bash import BashOperator
 Dag_id = "Clean_data_log"
 dag = DAG(
     Dag_id,
-    schedule_interval="@daily",
+    schedule_interval="0 15 * * *",
     start_date=datetime(2023, 6, 25),
     catchup=False,
 )
