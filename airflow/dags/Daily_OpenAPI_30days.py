@@ -163,13 +163,16 @@ def transform_data(**context):
     df["noticeEdt"] = pd.to_datetime(df["noticeEdt"], format="%Y%m%d")
     df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
     # print(df.info())
-    
+
     TRANSFORM_SAVE_NAME = "transform_strayanimal_data_" + dates[-1] + ".csv"
     TRANSFORM_LOCAL_PATH_NAME = os.path.join(
-            os.environ["AIRFLOW_HOME"], "data", "strayanimal_30days_data", TRANSFORM_SAVE_NAME
-        )
+        os.environ["AIRFLOW_HOME"],
+        "data",
+        "strayanimal_30days_data",
+        TRANSFORM_SAVE_NAME,
+    )
     df.to_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig")
-    return TRANSFORM_SAVE_NAME,TRANSFORM_LOCAL_PATH_NAME
+    return TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME
 
 
 def load_to_bigquery(**context):
