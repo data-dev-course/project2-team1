@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 
 
+
 def on_failure_callback(context):
     """
     https://airflow.apache.org/_modules/airflow/operators/slack_operator.html
@@ -18,6 +19,7 @@ def on_failure_callback(context):
         + datetime.now(timezone("Asia/Seoul")).strftime("%Y-%m-%d %H:%M:%S")
         + "```"
     )
+
     send_message_to_a_slack_channel(text, ":scream:")
 
 
