@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from airflow import DAG
 from airflow.macros import *
 from airflow.operators.bash import BashOperator

@@ -7,7 +7,6 @@ import aiohttp
 import pandas as pd
 from airflow import DAG
 from airflow.exceptions import AirflowException
-from airflow.macros import *
 from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from dateutil.relativedelta import relativedelta
