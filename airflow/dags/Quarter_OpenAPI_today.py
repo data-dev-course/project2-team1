@@ -15,6 +15,7 @@ from datetime import datetime
 from pytz import timezone
 from google.cloud import storage
 from google.cloud import bigquery
+from plugins import slack
 
 
 DAG_ID = "Quarter_OpenAPI_today"
@@ -23,6 +24,9 @@ dag = DAG(
     schedule_interval="*/15 * * * *",
     start_date=datetime(2023, 6, 25),
     catchup=False,
+    default_args={
+        "on_failure_callback": slack.on_failure_callback,
+    },
 )
 
 
@@ -132,18 +136,23 @@ def upload_data_GCS(**context):
 
 
 def read_data_from_storage(**context):
-    bucket_name = context["params"]["bucket_name"]
-    today = datetime.now(timezone("Asia/Seoul")).strftime("%Y%m%d")
-    file_name = f"raw-data/strayanimal-today_data/strayanimal_today_data_{today}"
+    try:
+        bucket_name = context["params"]["bucket_name"]
+        today = datetime.now(timezone("Asia/Seoul")).strftime("%Y%m%d")
+        file_name = f"raw-data/strayanimal-today_data/strayanimal_today_data_{today}"
 
-    storage_client = storage.Client()
-    blob = storage_client.get_bucket(bucket_name).get_blob(file_name)
-    csv_data = blob.download_as_text().splitlines()
-    df = pd.read_csv(io.StringIO("\n".join(csv_data)))
+        storage_client = storage.Client()
+        blob = storage_client.get_bucket(bucket_name).get_blob(file_name)
+        csv_data = blob.download_as_text().splitlines()
+        df = pd.read_csv(io.StringIO("\n".join(csv_data)))
 
-    print(f"{file_name} 읽어오기 성공")
+        print(f"{file_name} 읽어오기 성공")
 
-    return df
+        return df
+
+    except Exception as e:
+        print("read_data_from_storage - 오류 발생 : ", e)
+        raise AirflowException(f"오류 발생. {e}")
 
 
 def transform_data(**context):
@@ -219,16 +228,22 @@ def load_to_bigquery(**context):
         bigquery_client.delete_table(table_path)
         table_exists = False
 
-    # 새로운 테이블 생성
-    schema = bigquery_schema
-    table_ref = bigquery_client.create_table(bigquery.Table(table_path, schema=schema))
+    try:
+        # 새로운 테이블 생성
+        schema = bigquery_schema
+        table_ref = bigquery_client.create_table(
+            bigquery.Table(table_path, schema=schema)
+        )
 
-    # 데이터프레임을 대상 테이블로 적재
-    job_config = bigquery.LoadJobConfig(schema=bigquery_schema)
-    job = bigquery_client.load_table_from_dataframe(
-        df, table_ref, job_config=job_config
-    )
-    job.result()  # Job 실행 완료 대기
+        # 데이터프레임을 대상 테이블로 적재
+        job_config = bigquery.LoadJobConfig(schema=bigquery_schema)
+        job = bigquery_client.load_table_from_dataframe(
+            df, table_ref, job_config=job_config
+        )
+        job.result()  # Job 실행 완료 대기
+    except Exception as e:
+        print("load_to_bigquery - 오류 발생 : ", e)
+        raise AirflowException(f"오류 발생. {e}")
 
 
 extract = PythonOperator(
