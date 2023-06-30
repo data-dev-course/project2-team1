@@ -111,7 +111,7 @@ def upload_data_GCS(**context):
 
     # LOCAL_PATH_NAME = 'strayanimal_today_data_20230625-0000.csv'
     # SAVE_NAME[:-9]로 사용
-    SAVE_NAME = SAVE_NAME[:-9], SAVE_NAME[-8:-4]
+    SAVE_NAME = SAVE_NAME[:-9]
 
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(
         os.environ["AIRFLOW_HOME"], "keys", "strayanimal-bucket.json"
