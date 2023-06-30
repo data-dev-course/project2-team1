@@ -66,3 +66,9 @@ jobs:
         --project=${{ env.PROJECT_ID }}
         --command="sudo cp -rlf /tmp/airflow/* ~/airflow"
 
+    - name: 'Generate dynamic dags'
+      run: gcloud compute ssh ${{ env.GCE_INSTANCE }}
+        --zone=${{ env.GCE_INSTANCE_ZONE }}
+        --project=${{ env.PROJECT_ID }}
+        --command="python3 ~/airflow/dags/dynamic_dags/plugin/chart_generator.py"
+
