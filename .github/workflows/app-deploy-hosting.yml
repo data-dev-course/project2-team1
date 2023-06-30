@@ -2,6 +2,8 @@ name: Firebase Webapp Deploy Hosting
   
 on:
   push:
+    paths:
+      - "strayanimal-app/**"
   #pull_request:
   #  types:
   #    - closed
@@ -65,7 +67,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: build
-          path: /
+          path: /home/runner/work/project2-team1/project2-team1/strayanimal-app/strayanimal/build
   deploy:
     #if#: github.event.pull_request.merged == true
     needs: build
@@ -80,7 +82,7 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: build
-          path: /
+          path: /home/runner/work/project2-team1/project2-team1/strayanimal-app/strayanimal/build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.TOKEN }}"
