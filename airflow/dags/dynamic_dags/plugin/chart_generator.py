@@ -6,7 +6,6 @@ file_dir = os.path.dirname(os.path.abspath(__file__))
 env = Environment(loader=FileSystemLoader(file_dir))
 template = env.get_template("chart_templated_dag.jinja2")
 
-
 with open(f"{file_dir}/config_chart.yml", "r") as cf:
     config = yaml.safe_load(cf)
 
