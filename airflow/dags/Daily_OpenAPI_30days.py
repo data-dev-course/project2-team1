@@ -14,6 +14,8 @@ from dateutil.relativedelta import relativedelta
 from pytz import timezone
 from google.cloud import storage
 from google.cloud import bigquery
+from plugins import slack
+
 
 OPENAPI_URL = Variable.get("OpenAPI_URL")
 OPENAPI_KEY = Variable.get("OpenAPI_KEY")
@@ -23,6 +25,9 @@ dag = DAG(
     schedule_interval="5 15 * * *",
     start_date=datetime(2023, 6, 25),
     catchup=False,
+    default_args={
+        "on_failure_callback": slack.on_failure_callback,
+    },
 )
 
 
@@ -166,29 +171,33 @@ def upload_data_GCS(**context):
 
 
 def transform_data(**context):
-    SAVE_NAME, LOCAL_PATH_NAME = context["ti"].xcom_pull(
-        task_ids="extract_data_OpenAPI"
-    )
-    df = pd.read_csv(LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0)
-    today = datetime.now(timezone("Asia/Seoul")).strftime("%Y%m%d")
+    try:
+        SAVE_NAME, LOCAL_PATH_NAME = context["ti"].xcom_pull(
+            task_ids="extract_data_OpenAPI"
+        )
+        df = pd.read_csv(LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0)
+        today = datetime.now(timezone("Asia/Seoul")).strftime("%Y%m%d")
 
-    df["desertionNo"] = df["desertionNo"].astype(int)
+        df["desertionNo"] = df["desertionNo"].astype(int)
 
-    df["created_date"] = pd.to_datetime(today, format="%Y%m%d")
-    df["happenDt"] = pd.to_datetime(df["happenDt"], format="%Y%m%d")
-    df["noticeEdt"] = pd.to_datetime(df["noticeEdt"], format="%Y%m%d")
-    df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
-    # print(df.info())
+        df["created_date"] = pd.to_datetime(today, format="%Y%m%d")
+        df["happenDt"] = pd.to_datetime(df["happenDt"], format="%Y%m%d")
+        df["noticeEdt"] = pd.to_datetime(df["noticeEdt"], format="%Y%m%d")
+        df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
+        # print(df.info())
 
-    TRANSFORM_SAVE_NAME = "transform" + SAVE_NAME
-    TRANSFORM_LOCAL_PATH_NAME = os.path.join(
-        os.environ["AIRFLOW_HOME"],
-        "data",
-        "strayanimal_30days_data",
-        TRANSFORM_SAVE_NAME,
-    )
-    df.to_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig")
-    return TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME
+        TRANSFORM_SAVE_NAME = "transform" + SAVE_NAME
+        TRANSFORM_LOCAL_PATH_NAME = os.path.join(
+            os.environ["AIRFLOW_HOME"],
+            "data",
+            "strayanimal_30days_data",
+            TRANSFORM_SAVE_NAME,
+        )
+        df.to_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig")
+        return TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME
+    except Exception as e:
+        print("transform_data - 오류 발생 : ", e)
+        raise AirflowException(f"오류 발생. {e}")
 
 
 def load_to_bigquery(**context):
@@ -280,9 +289,10 @@ def load_to_bigquery(**context):
         # 임시 테이블 삭제
         bigquery_client.delete_table(temp_table_path)
 
-        print("success")
-    except:
-        print("failed")
+        print("load_to_bigquery success")
+    except Exception as e:
+        print("load_to_bigquery failed")
+        raise AirflowException(f"animal_info 테이블 적재 실패! - {e}")
 
 
 extract = PythonOperator(
