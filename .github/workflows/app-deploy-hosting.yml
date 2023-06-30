@@ -1,17 +1,19 @@
 name: Firebase Webapp Deploy Hosting
   
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - main
-    paths:
-      - "strayanimal-app/**"
+  push:
+  #pull_request:
+  #  types:
+  #    - closed
+  #  branches:
+  #    - main
+  #    - develop
+  #  paths:
+  #    - "strayanimal-app/**"
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
+    #if#: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: firebase
     defaults:
@@ -52,13 +54,20 @@ jobs:
           cd strayanimal && npm ci
           cd ..
           npm ci && npm run build
+
+      - run: npm test
+
+      - run: |
+          ls -al
+          pwd
+
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
           name: build
           path: /
   deploy:
-    if: github.event.pull_request.merged == true
+    #if#: github.event.pull_request.merged == true
     needs: build
     runs-on: ubuntu-latest
     defaults:
