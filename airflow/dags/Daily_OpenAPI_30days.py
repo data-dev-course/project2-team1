@@ -62,6 +62,7 @@ def extract_data_OpenAPI(**context):
             "orgNm",
             "chargeNm",
             "officetel",
+            "noticeComment",
         ]
     )
 
@@ -164,7 +165,7 @@ def transform_data(**context):
     df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
     # print(df.info())
 
-    TRANSFORM_SAVE_NAME = "transform_strayanimal_data_" + dates[-1] + ".csv"
+    TRANSFORM_SAVE_NAME = "transform"+SAVE_NAME
     TRANSFORM_LOCAL_PATH_NAME = os.path.join(
         os.environ["AIRFLOW_HOME"],
         "data",
