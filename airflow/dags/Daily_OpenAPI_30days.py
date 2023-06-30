@@ -154,7 +154,7 @@ def transform_data(**context):
     SAVE_NAME, LOCAL_PATH_NAME = context["ti"].xcom_pull(
         task_ids="extract_data_OpenAPI"
     )
-    df = pd.read_csv(LOCAL_PATH_NAME, encoding="utf-8-sig", index_col = 0)
+    df = pd.read_csv(LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0)
     today = datetime.now(timezone("Asia/Seoul")).strftime("%Y%m%d")
 
     df["desertionNo"] = df["desertionNo"].astype(int)
@@ -214,7 +214,7 @@ def load_to_bigquery(**context):
     TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME = context["ti"].xcom_pull(
         task_ids="transform_data"
     )
-    df = pd.read_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig", index_col = 0)
+    df = pd.read_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0)
 
     # 데이터프레임을 로드할 테이블 경로 설정
     table_path = f"{project_id}.{dataset_id}.{table_id}"
@@ -268,6 +268,7 @@ def load_to_bigquery(**context):
         print("success")
     except:
         print("failed")
+
 
 extract = PythonOperator(
     dag=dag,
