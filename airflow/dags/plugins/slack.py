@@ -13,11 +13,7 @@ def on_failure_callback(context):
     """
     text = str(context["task_instance"])
     text += "```" + str(context.get("exception")) + "```"
-    text += (
-        "``` 발생시간 : "
-        + datetime.now(timezone("Asia/Seoul")).strftime("%Y-%m-%d %H:%M:%S")
-        + "```"
-    )
+    text += "``` 발생시간 : " + "```" + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "```"
 
     send_message_to_a_slack_channel(text, ":scream:")
 
