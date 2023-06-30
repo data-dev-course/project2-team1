@@ -70,5 +70,5 @@ jobs:
       run: gcloud compute ssh ${{ env.GCE_INSTANCE }}
         --zone=${{ env.GCE_INSTANCE_ZONE }}
         --project=${{ env.PROJECT_ID }}
-        --command="python3 ~/airflow/dags/dynamic_dags/plugin/chart_generator.py"
+        --command="rm -rf ~/airflow/dags/dynamic_dags/*.py && python3 ~/airflow/dags/dynamic_dags/plugin/chart_generator.py"
 
