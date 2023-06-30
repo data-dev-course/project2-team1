@@ -251,7 +251,7 @@ def load_to_bigquery(**context):
         print(f"{table_path} 테이블 존재")
         table_exists = True
     except Exception as e:
-        print(f"{table_path} 테이블 존재하지 않음")
+        print(f"{e} : {table_path} 테이블 존재하지 않음")
         table_exists = False
         pass
 
