@@ -15,7 +15,8 @@ def on_failure_callback(context):
     text += "```" + str(context.get("exception")) + "```"
     text += (
         "``` 발생시간 : "
-        + datetime.now(timezone("Asia/Seoul")).strftime("%Y-%m-%d %H:%M:%S")
+        + "```"
+        + datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         + "```"
     )
 
