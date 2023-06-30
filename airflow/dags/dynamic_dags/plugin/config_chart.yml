@@ -105,15 +105,10 @@ chart_data:
   - chart_name: "차트11_품종_견묘_등록_유기_비율"
     chart_num: "chart_11"
     query: "
-    SELECT age, ageCount, ROUND(ageCount / SUM(ageCount) OVER(),3) as agePercent
-    FROM
-    (
-        SELECT age, count(age) as ageCount
-        FROM analytics.animal_analytics A 
-        GROUP BY age
-        HAVING (COUNT(*))>2
-    )
-    ORDER BY ageCount DESC
+    SELECT *
+    FROM `analytics.percent_stary_register_spcs`
+    ORDER BY registerCnt DESC
+    LIMIT 100;
     "
   - chart_name: "차트12_유기동물_상세정보_고양이"
     chart_num: "chart_12_cat"

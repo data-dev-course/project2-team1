@@ -6,6 +6,14 @@ from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
 from datetime import datetime
 
+default_args = {
+    "owner": "ih-tjpark",
+    "depends_on_past": False,
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "retries": 1,
+}
+
 excute_sql = """
     SELECT 
     DISTINCT(desertionNo),
@@ -58,6 +66,7 @@ with DAG(
     schedule="20 15 * * *",
     max_active_runs=1,
     schedule_interval=None,
+    default_args=default_args,
 ) as dag:
     bigquery_create_analytics_table = BigQueryExecuteQueryOperator(
         task_id="excute_query",
