@@ -5,7 +5,6 @@ import requests
 from datetime import datetime
 
 
-
 def on_failure_callback(context):
     """
     https://airflow.apache.org/_modules/airflow/operators/slack_operator.html
