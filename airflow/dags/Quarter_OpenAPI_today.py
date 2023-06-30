@@ -217,7 +217,7 @@ def load_to_bigquery(**context):
     try:
         bigquery_client.get_table(table_path)
         table_exists = True
-    except:
+    except Exception as e:
         table_exists = False
 
     # 테이블이 존재하는 경우 테이블 삭제
