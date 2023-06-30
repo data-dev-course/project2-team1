@@ -71,7 +71,7 @@ x-airflow-common:
     # Airflow config [Logging]
     AIRFLOW__LOGGING__REMOTE_LOGGING: True
     AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: 'gcp_conn_service'
-    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: 'gs://strayanimal-bucket/dag-logging-test/'
+    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: 'gs://strayanimal-bucket/dag-logging/'
     AIRFLOW__LOGGING__DELETE_LOCAL_LOGS: True
     # AIRFLOW__LOGGING__REMOTE_TASK_HANDLER_KWARGS: '{{ "delete_local_copy": true }}' # 2.6.0에서 새로 추가된 환경변수라는데 작동이 안되는 문제가 있음
     
