@@ -66,8 +66,8 @@ jobs:
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
-          name: build
-          path: /home/runner/work/project2-team1/project2-team1/strayanimal-app/strayanimal/build
+          name: app
+          path: /home/runner/work/project2-team1/project2-team1/strayanimal-app/
   deploy:
     #if#: github.event.pull_request.merged == true
     needs: build
@@ -81,8 +81,8 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@master
         with:
-          name: build
-          path: /home/runner/work/project2-team1/project2-team1/strayanimal-app/strayanimal/build
+          name: app
+          path: /home/runner/work/project2-team1/project2-team1/strayanimal-app/
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.TOKEN }}"
