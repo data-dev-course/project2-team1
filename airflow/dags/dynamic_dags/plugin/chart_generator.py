@@ -18,7 +18,7 @@ for i, chart_dic in enumerate(chart_dic_list):
         chart_dic["call_trigger"] = ">> trigger"
         chart_dic["trigger_chart_num"] = chart_dic_list[i + 1]["chart_num"]
     with open(
-        f"dags/dynamic_dags/Daily_Bigquery_to_Firestore_{chart_dic['chart_num']}.py",
+        f"/home/runner/airflow/dags/dynamic_dags/Daily_Bigquery_to_Firestore_{chart_dic['chart_num']}.py",
         "w",
     ) as f:
         f.write(template.render(chart_dic))
