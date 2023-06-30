@@ -258,9 +258,7 @@ def load_to_bigquery(**context):
     # 테이블가 존재하지 않는 경우에만 새로운 테이블 생성
     if not table_exists:
         schema = bigquery_schema
-        bigquery_client.create_table(
-            bigquery.Table(table_path, schema=schema)
-        )
+        bigquery_client.create_table(bigquery.Table(table_path, schema=schema))
     else:
         bigquery_client.get_table(table_path)
 
