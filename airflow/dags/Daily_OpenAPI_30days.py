@@ -62,6 +62,7 @@ def extract_data_OpenAPI(**context):
             "orgNm",
             "chargeNm",
             "officetel",
+            "noticeComment",
         ]
     )
 
@@ -122,13 +123,13 @@ def extract_data_OpenAPI(**context):
     )
     result_df.to_csv(LOCAL_PATH_NAME, encoding="utf-8-sig")
 
-    return SAVE_NAME, LOCAL_PATH_NAME, result_df
+    return SAVE_NAME, LOCAL_PATH_NAME
 
 
 def upload_data_GCS(**context):
     SAVE_NAME, LOCAL_PATH_NAME = context["ti"].xcom_pull(
         task_ids="extract_data_OpenAPI"
-    )[:2]
+    )
     # print(SAVE_NAME, LOCAL_PATH_NAME)
 
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(
@@ -150,7 +151,10 @@ def upload_data_GCS(**context):
 
 
 def transform_data(**context):
-    df = context["ti"].xcom_pull(task_ids="extract_data_OpenAPI")[2]
+    SAVE_NAME, LOCAL_PATH_NAME = context["ti"].xcom_pull(
+        task_ids="extract_data_OpenAPI"
+    )
+    df = pd.read_csv(LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0)
     today = datetime.now(timezone("Asia/Seoul")).strftime("%Y%m%d")
 
     df["desertionNo"] = df["desertionNo"].astype(int)
@@ -161,7 +165,15 @@ def transform_data(**context):
     df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
     # print(df.info())
 
-    return df
+    TRANSFORM_SAVE_NAME = "transform" + SAVE_NAME
+    TRANSFORM_LOCAL_PATH_NAME = os.path.join(
+        os.environ["AIRFLOW_HOME"],
+        "data",
+        "strayanimal_30days_data",
+        TRANSFORM_SAVE_NAME,
+    )
+    df.to_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig")
+    return TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME
 
 
 def load_to_bigquery(**context):
@@ -198,30 +210,26 @@ def load_to_bigquery(**context):
     dataset_id = context["params"]["dataset_id"]
     table_id = context["params"]["table_id"]
     temp_table_id = "daily_temp"
-    df = context["ti"].xcom_pull(task_ids="transform_data")
+
+    TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME = context["ti"].xcom_pull(
+        task_ids="transform_data"
+    )
+    df = pd.read_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0)
 
     # 데이터프레임을 로드할 테이블 경로 설정
     table_path = f"{project_id}.{dataset_id}.{table_id}"
     temp_table_path = f"{project_id}.{dataset_id}.{temp_table_id}"
 
-    # 이전 작업을 위한 백업 테이블명
-    backup_table_id = "backup_table"
-
     # BigQuery 클라이언트 인스턴스 생성
     bigquery_client = bigquery.Client()
 
     try:
-        # 이전 작업을 위해 원본 테이블을 백업
-        backup_table_ref = bigquery_client.copy_table(table_path, backup_table_id)
-    except:
-        # 백업 실패 시 처리할 예외 처리 로직 작성
-        pass
-
-    try:
         # 테이블 존재 여부 확인
         bigquery_client.get_table(table_path)
+        print(f"{table_path} 테이블 존재")
         table_exists = True
     except:
+        print(f"{table_path} 테이블 존재하지 않음")
         table_exists = False
         pass
 
@@ -259,12 +267,6 @@ def load_to_bigquery(**context):
 
         print("success")
     except:
-        # 작업 실패 시 이전 상태로 복구
-        bigquery_client.copy_table(backup_table_ref, table_path)
-
-        # 실패한 작업으로 인해 생성된 임시 테이블을 삭제
-        bigquery_client.delete_table(temp_table_path)
-
         print("failed")
 
 

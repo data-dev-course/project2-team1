@@ -7,7 +7,7 @@
     "start": "node init.js",
     "dev": "nodemon init.js",
     "build": "cd strayanimal && npm run build",
-    "test": "jest",
+    "test": "jest -c jest.config.js --watch",
     "babel-node": "babel-node --presets='@babel/preset-env' --ignore='foo|bar|baz'"
   },
   "keywords": [],
