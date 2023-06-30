@@ -3,7 +3,6 @@ from datetime import datetime
 
 import pandas as pd
 from airflow.decorators import task
-from airflow.macros import *
 from airflow.models import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.providers.google.cloud.sensors.gcs import GCSObjectExistenceSensor

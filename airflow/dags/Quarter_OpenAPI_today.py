@@ -8,7 +8,6 @@ import pandas as pd
 import requests
 from airflow import DAG
 from airflow.exceptions import AirflowException
-from airflow.macros import *
 from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from google.cloud import bigquery, storage
@@ -112,7 +111,7 @@ def upload_data_GCS(**context):
 
     # LOCAL_PATH_NAME = 'strayanimal_today_data_20230625-0000.csv'
     # SAVE_NAME[:-9]로 사용
-    SAVE_NAME, SAVE_VERSION_NAME = SAVE_NAME[:-9], SAVE_NAME[-8:-4]
+    SAVE_NAME = SAVE_NAME[:-9], SAVE_NAME[-8:-4]
 
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(
         os.environ["AIRFLOW_HOME"], "keys", "strayanimal-bucket.json"
@@ -216,9 +215,10 @@ def load_to_bigquery(**context):
 
     # 테이블이 이미 존재하는지 확인
     try:
-        table = bigquery_client.get_table(table_path)
+        bigquery_client.get_table(table_path)
         table_exists = True
-    except NotFound:
+    except Exception as e:
+        print(f"{e}")
         table_exists = False
 
     # 테이블이 존재하는 경우 테이블 삭제
@@ -285,4 +285,5 @@ load = PythonOperator(
         "project_id": "strayanimal",
     },
 )
+
 extract >> upload_file >> read >> transform >> load
