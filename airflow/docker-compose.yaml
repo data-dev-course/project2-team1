@@ -62,11 +62,25 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'true'
-    AIRFLOW__LOGGING__REMOTE_LOGGING: 'true'
+
+    # AIRFLOW config [Core], [webserver]
+    # AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Seoul
+    # AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: Asia/Seoul
+    # AIRFLOW__CORE__LOG_TIMEZONE: Asia/Seoul # bard가 알려줬으나, 작동 안함
+
+    # Airflow config [Logging]
+    AIRFLOW__LOGGING__REMOTE_LOGGING: True
     AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: 'gcp_conn_service'
-    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: 'gs://strayanimal-bucket/dag-logging'
+    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: 'gs://strayanimal-bucket/dag-logging-test/'
+    AIRFLOW__LOGGING__DELETE_LOCAL_LOGS: True
+    # AIRFLOW__LOGGING__REMOTE_TASK_HANDLER_KWARGS: '{{ "delete_local_copy": true }}' # 2.6.0에서 새로 추가된 환경변수라는데 작동이 안되는 문제가 있음
+    
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- google-cloud-storage google-cloud-bigquery google-cloud-pubsub google-cloud-firestore google-cloud-scheduler google-cloud-logging google-cloud-functions pandas numpy}
+    
+    # 상속하는 모든 컨테이너 TimeZone 변경
+    TZ: 'Asia/Seoul'
+
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
