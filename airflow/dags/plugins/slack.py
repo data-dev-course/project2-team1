@@ -1,8 +1,8 @@
-from airflow.models import Variable
-
 import logging
-import requests
 from datetime import datetime
+
+import requests
+from airflow.models import Variable
 
 
 def on_failure_callback(context):

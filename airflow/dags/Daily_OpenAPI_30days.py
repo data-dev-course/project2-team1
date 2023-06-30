@@ -1,21 +1,20 @@
-from airflow import DAG
-from airflow.macros import *
-from airflow.operators.python import PythonOperator
-from airflow.exceptions import AirflowException
-from airflow.models import Variable
-
-import os
-import json
-import pandas as pd
 import asyncio
-import aiohttp
+import json
+import os
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
-from pytz import timezone
-from google.cloud import storage
-from google.cloud import bigquery
-from plugins import slack
 
+import aiohttp
+import pandas as pd
+from airflow import DAG
+from airflow.exceptions import AirflowException
+from airflow.macros import *
+from airflow.models import Variable
+from airflow.operators.python import PythonOperator
+from dateutil.relativedelta import relativedelta
+from google.cloud import bigquery, storage
+from pytz import timezone
+
+from plugins import slack
 
 OPENAPI_URL = Variable.get("OpenAPI_URL")
 OPENAPI_KEY = Variable.get("OpenAPI_KEY")
