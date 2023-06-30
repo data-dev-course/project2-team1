@@ -1,6 +1,5 @@
 from google.cloud import bigquery
 from google.cloud import firestore
-import json
 import datetime
 import sys
 import math

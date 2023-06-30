@@ -1,21 +1,17 @@
 name: Firebase Webapp Deploy Hosting
   
 on:
-  push:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
     paths:
       - "strayanimal-app/**"
-  #pull_request:
-  #  types:
-  #    - closed
-  #  branches:
-  #    - main
-  #    - develop
-  #  paths:
-  #    - "strayanimal-app/**"
 
 jobs:
-  build:
-    #if#: github.event.pull_request.merged == true
+  test_build_deploy:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: firebase
     defaults:
@@ -56,36 +52,14 @@ jobs:
           cd strayanimal && npm ci
           cd ..
           npm ci && npm run build
+      
+      - name: 'Jest Testing w/ coverage'
+        run: npm test
 
-      - run: npm test
-
-      - run: |
-          ls -al
-          pwd
-
-      - name: Archive Production Artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: app
-          path: /home/runner/work/project2-team1/project2-team1/strayanimal-app/
-  deploy:
-    #if#: github.event.pull_request.merged == true
-    needs: build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./strayanimal-app
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@master
-      - name: Download Artifact
-        uses: actions/download-artifact@master
-        with:
-          name: app
-          path: /home/runner/work/project2-team1/project2-team1/strayanimal-app/
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_STRAYANIMAL }}"
           projectId: strayanimal
           channelId: live
+          entryPoint: /home/runner/work/project2-team1/project2-team1/strayanimal-app
