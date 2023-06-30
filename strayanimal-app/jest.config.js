@@ -1,19 +1,20 @@
 /** @type {import('jest').Config} */
 const config = {
-    moduleFileExtensions: ["js", "json", "jsx", "json"],
+    rootDir: "./strayanimal",
     transform: {
         "^.+\\.(js|jsx)?$": "babel-jest",
     },
-    moduleNameMapper: {
-        "^@/(.*)$": "<rootDir>/$1",
-        '\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
-            '<rootDir>/__mocks__/fileMock.js',
-        '\\.(css|less)$': '<rootDir>/__mocks__/fileMock.js',
-    },
+    testEnvironment: "jsdom",
+    collectCoverage: true,
+    collectCoverageFrom: ['<rootDir>/src/**/*.{js,jsx}'],
+    coverageDirectory: 'coverage',
     testMatch: [
-        "<rootDir>/**/*.test.(js|jsx|ts|tsx)",
-        "<rootDir>/(tests/unit/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx))",
+        "<rootDir>/**/*.test.(js|jsx)",
+        "<rootDir>/(tests/unit/**/*.spec.(js|jsx)|**/__tests__/*.(js|jsx))",
     ],
-    transformIgnorePatterns: ["<rootDir>/node_modules/"],
+    moduleNameMapper: {
+        '\\.(css|less)$': '<rootDir>/jest/__mocks__/styleMock.js',
+    },
+    setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
 };
 export default config;
