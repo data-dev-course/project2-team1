@@ -4,7 +4,6 @@ import requests
 import pandas as pd
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-import uploader
 
 ERROR_CNT = 0
 MAX_RETRIES = 10
