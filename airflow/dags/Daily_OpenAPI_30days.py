@@ -211,7 +211,7 @@ def load_to_bigquery(**context):
     table_id = context["params"]["table_id"]
     temp_table_id = "daily_temp"
     TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME = context["ti"].xcom_pull(
-        task_ids="extract_data_OpenAPI"
+        task_ids="transform_data"
     )
     df = pd.read_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig")
 
