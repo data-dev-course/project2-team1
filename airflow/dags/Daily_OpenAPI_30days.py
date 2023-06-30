@@ -62,6 +62,7 @@ def extract_data_OpenAPI(**context):
             "orgNm",
             "chargeNm",
             "officetel",
+            "noticeComment",
         ]
     )
 
@@ -122,13 +123,13 @@ def extract_data_OpenAPI(**context):
     )
     result_df.to_csv(LOCAL_PATH_NAME, encoding="utf-8-sig")
 
-    return SAVE_NAME, LOCAL_PATH_NAME, result_df
+    return SAVE_NAME, LOCAL_PATH_NAME
 
 
 def upload_data_GCS(**context):
     SAVE_NAME, LOCAL_PATH_NAME = context["ti"].xcom_pull(
         task_ids="extract_data_OpenAPI"
-    )[:2]
+    )
     # print(SAVE_NAME, LOCAL_PATH_NAME)
 
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(
@@ -150,7 +151,10 @@ def upload_data_GCS(**context):
 
 
 def transform_data(**context):
-    df = context["ti"].xcom_pull(task_ids="extract_data_OpenAPI")[2]
+    SAVE_NAME, LOCAL_PATH_NAME = context["ti"].xcom_pull(
+        task_ids="extract_data_OpenAPI"
+    )
+    df = pd.read_csv(LOCAL_PATH_NAME, encoding="utf-8-sig")
     today = datetime.now(timezone("Asia/Seoul")).strftime("%Y%m%d")
 
     df["desertionNo"] = df["desertionNo"].astype(int)
@@ -161,7 +165,15 @@ def transform_data(**context):
     df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
     # print(df.info())
 
-    return df
+    TRANSFORM_SAVE_NAME = "transform" + SAVE_NAME
+    TRANSFORM_LOCAL_PATH_NAME = os.path.join(
+        os.environ["AIRFLOW_HOME"],
+        "data",
+        "strayanimal_30days_data",
+        TRANSFORM_SAVE_NAME,
+    )
+    df.to_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig")
+    return TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME
 
 
 def load_to_bigquery(**context):
@@ -198,7 +210,10 @@ def load_to_bigquery(**context):
     dataset_id = context["params"]["dataset_id"]
     table_id = context["params"]["table_id"]
     temp_table_id = "daily_temp"
-    df = context["ti"].xcom_pull(task_ids="transform_data")
+    TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME = context["ti"].xcom_pull(
+        task_ids="transform_data"
+    )
+    df = pd.read_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig")
 
     # 데이터프레임을 로드할 테이블 경로 설정
     table_path = f"{project_id}.{dataset_id}.{table_id}"
