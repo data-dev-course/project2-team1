@@ -20,7 +20,7 @@ from google.cloud import bigquery
 DAG_ID = "Quarter_OpenAPI_today"
 dag = DAG(
     DAG_ID,
-    schedule_interval="*/10 * * * *",
+    schedule_interval="*/15 * * * *",
     start_date=datetime(2023, 6, 25),
     catchup=False,
 )
@@ -86,10 +86,10 @@ def extract_data_OpenAPI(**context):
                 print(today_HM, "성공 데이터 :", result_df.shape[0])
                 break
         except Exception as e:
-            if e == "item":
+            if "item" in e:
                 print(today_HM + "기준", "등록된 유기동물 데이터가 없습니다.")
                 break
-            print(today_HM, "error :", e)
+            print(today_HM, "등록되지 않은 error :", e)
     else:
         raise AirflowException("10회 이상 추출 실패, OpenAPI 서버 문제로 추출 중단")
 
