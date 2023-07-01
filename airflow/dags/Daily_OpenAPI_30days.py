@@ -193,7 +193,7 @@ def transform_data(**context):
         df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
         # print(df.info())
 
-        TRANSFORM_SAVE_NAME = "transform" + SAVE_NAME
+        TRANSFORM_SAVE_NAME = "transform_" + SAVE_NAME
         TRANSFORM_LOCAL_PATH_NAME = os.path.join(
             os.environ["AIRFLOW_HOME"],
             "data",
@@ -245,7 +245,13 @@ def load_to_bigquery(**context):
     TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME = context["ti"].xcom_pull(
         task_ids="transform_data"
     )
-    df = pd.read_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0)
+    date_cols = ["happenDt", "noticeSdt", "noticeEdt", "created_date"]
+    df = pd.read_csv(
+        TRANSFORM_LOCAL_PATH_NAME,
+        encoding="utf-8-sig",
+        index_col=0,
+        parse_dates=date_cols,
+    )
 
     # 데이터프레임을 로드할 테이블 경로 설정
     table_path = f"{project_id}.{dataset_id}.{table_id}"
