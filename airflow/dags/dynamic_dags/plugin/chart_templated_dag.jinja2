@@ -7,6 +7,8 @@ from google.cloud import bigquery
 from google.cloud import firestore
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
+from airflow.exceptions import AirflowException
+from plugins import slack
 
 default_args = {
     "owner": "ih-tjpark",
@@ -37,87 +39,111 @@ with DAG(
 
     @task
     def extract():
-        bigquery_client = get_bigquery_connection()
-        query_job = bigquery_client.query("{{query}}")
-        results = query_job.to_dataframe().to_json(orient='records')
-        print("{{chart_name}} data 추출 완료")
-        return results
+        try:
+            bigquery_client = get_bigquery_connection()
+            query_job = bigquery_client.query("{{query}}")
+            results = query_job.to_dataframe().to_json(orient='records')
+            print("{{chart_name}} data 추출 완료")
+            return results
+        except Exception as e:
+            print("extract - 오류 발생 : ", e)
+            raise AirflowException(f"{{chart_name}} 데이터 추출 실패 - {e}")
 
     @task
     def transform(row_data):
         dic_list = []
-        row_data_list = json.loads(row_data)
-        for dic_row in row_data_list:
-            for col in dic_row:
-                if isinstance(dic_row[col], datetime.date):
-                    dic_row[col] = dic_row[col].strftime('%Y-%m-%d')
-            dic_list.append(dic_row) 
-        print("{{chart_name}} data 변환 완료")
-        return dic_list
+        try:
+            row_data_list = json.loads(row_data)
+            if 'happenDt' in row_data_list[0]:
+                for dic_row in row_data_list:
+                    timestamp = dic_row['happenDt'] / 1000
+                    date = datetime.datetime.fromtimestamp(timestamp)
+                    dic_row = date.strftime('%Y-%m-%d')
+                    dic_list.append(dic_row)
+            else:
+                dic_list = row_data_list
+            print("{{chart_name}} data 변환 완료")
+            return dic_list
+        except Exception as e:
+            print("transfrom - 오류 발생 : ", e)
+            raise AirflowException(f"{{chart_name}} 데이터 변환 실패 - {e}")
 
     @task
     def direct_load(dic_list):
-        firestore_client = get_firestore_connection()
-        firestore_client.collection("strayanimal").document("{{chart_name}}").set({"data":dic_list})
-        print("{{chart_name}} 문서 저장 완료")
+        try:
+            firestore_client = get_firestore_connection()
+            firestore_client.collection("strayanimal").document("{{chart_name}}").set({"data":dic_list})
+            print("{{chart_name}} 문서 저장 완료")
+        except Exception as e:
+            print("load - 오류 발생 : ", e)
+            raise AirflowException(f"{{chart_name}} 데이터 저장 실패 - {e}")         
 
     @task
     def sub_collection_load(dic_list):
-        firestore_client = get_firestore_connection()
-        batch = firestore_client.batch()
-        parent_doc_ref = firestore_client.collection("strayanimal").document("차트12_유기동물_상세정보")
+        try:
+            firestore_client = get_firestore_connection()
+            batch = firestore_client.batch()
+            parent_doc_ref = firestore_client.collection("strayanimal").document("차트12_유기동물_상세정보")
 
-        # 데이터를 500개씩 잘라 배치 처리해서 저장
-        batch_size = 500
-        load_count = 0
+            # 데이터를 500개씩 잘라 배치 처리해서 저장
+            batch_size = 500
+            load_count = 0
 
-        for dic in dic_list:
-            notice_num = str(dic['desertionNo'])
-            sub_doc_ref = parent_doc_ref.collection("{{chart_name}}").document("공고번호_"+notice_num)
-            batch.set(sub_doc_ref, dic)
-            load_count +=1 
+            for dic in dic_list:
+                notice_num = str(dic['desertionNo'])
+                sub_doc_ref = parent_doc_ref.collection("{{chart_name}}").document("공고번호_"+notice_num)
+                batch.set(sub_doc_ref, dic)
+                load_count +=1 
 
-            if load_count % batch_size == 0:
+                if load_count % batch_size == 0:
+                    batch.commit()
+                    batch = firestore_client.batch()
+
+            if load_count % batch_size != 0:
                 batch.commit()
-                batch = firestore_client.batch()
-
-        if load_count % batch_size != 0:
-            batch.commit()
-            print(f"{load_count}개 문서 저장 완료")
+                print(f"{load_count}개 문서 저장 완료")
+        except Exception as e:
+            print("load - 오류 발생 : ", e)
+            raise AirflowException(f"{{chart_name}} 데이터 저장 실패 - {e}")
 
     @task
     def sub_collection_if_exist_delete():
-        firestore_client = get_firestore_connection()
-        sub_collection_name = "{{chart_name}}"
-        parent_doc_ref = firestore_client.collection("strayanimal").document("차트12_유기동물_상세정보")
-        
-        # 해당 컬렉션이 존재하는지 체크
-        sub_collections = parent_doc_ref.collections()
-        collection_exists = any(collection.id == sub_collection_name for collection in sub_collections)
-        if collection_exists:
-            print(sub_collection_name, ' 컬렉션이 존재해 삭제합니다.')
-            sub_collection_ref = parent_doc_ref.collection(sub_collection_name)
+        try:
+            firestore_client = get_firestore_connection()
+            sub_collection_name = "{{chart_name}}"
+            parent_doc_ref = firestore_client.collection("strayanimal").document("차트12_유기동물_상세정보")
             
-            # 문서 500개씩 가지고와 배치 처리해서 삭제 (모든 문서를 가지고 오면 메모리 제한에 걸릴 수 있음)
-            batch_size = 500
-            while True:
-                docs = sub_collection_ref.limit(batch_size).stream()
-                batch = firestore_client.batch()
-                batch_count = 0
+            # 해당 컬렉션이 존재하는지 체크
+            sub_collections = parent_doc_ref.collections()
+            collection_exists = any(collection.id == sub_collection_name for collection in sub_collections)
+            if collection_exists:
+                print(sub_collection_name, ' 컬렉션이 존재해 삭제합니다.')
+                sub_collection_ref = parent_doc_ref.collection(sub_collection_name)
+                
+                # 문서 500개씩 가지고와 배치 처리해서 삭제 (모든 문서를 가지고 오면 메모리 제한에 걸릴 수 있음)
+                batch_size = 500
+                while True:
+                    docs = sub_collection_ref.limit(batch_size).stream()
+                    batch = firestore_client.batch()
+                    batch_count = 0
 
-                for doc in docs:
-                    batch.delete(doc.reference)
-                    batch_count += 1
+                    for doc in docs:
+                        batch.delete(doc.reference)
+                        batch_count += 1
 
-                if batch_count == 0:
-                    # 삭제할 문서가 더 이상 없으면 반복문 종료
-                    break
+                    if batch_count == 0:
+                        # 삭제할 문서가 더 이상 없으면 반복문 종료
+                        break
 
-                batch.commit()
-            print('컬렉션 삭제를 완료했습니다.')
+                    batch.commit()
+                print('컬렉션 삭제를 완료했습니다.')
 
-        else:
-            print(sub_collection_name, ' 컬렉션이 존재하지 않습니다. 다음 작업을 진행합니다.')
+            else:
+                print(sub_collection_name, ' 컬렉션이 존재하지 않습니다. 다음 작업을 진행합니다.')
+        except Exception as e:
+            print("delete - 오류 발생 : ", e)
+            raise AirflowException(f"{{chart_name}} 데이터 삭제 실패 - {e}")  
+
 
     if "chart_12_dog" != "{{chart_num}}":
         trigger = TriggerDagRunOperator(
