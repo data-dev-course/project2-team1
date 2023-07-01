@@ -257,9 +257,9 @@ def load_to_bigquery(**context):
                 df, table_ref, job_config=job_config
             )
             job.result()  # Job 실행 완료 대기
-            print('quarter data full_refresh 완료')
-        else :
-            print('수집된 데이터가 없습니다')
+            print("quarter data full_refresh 완료")
+        else:
+            print("수집된 데이터가 없습니다")
     except Exception as e:
         print("load_to_bigquery - 오류 발생 : ", e)
         raise AirflowException(f"오류 발생. {e}")
