@@ -61,9 +61,11 @@ excute_sql = """
     LIMIT 10;
     """
 
+
 def on_failure():
-    print ("Daily_Bigquery_Create_Analytics 실패! {{ds}}")
+    print("Daily_Bigquery_Create_Analytics 실패! {{ds}}")
     raise AirflowException("bigquery execute query operator가 작업에 실패했습니다. {{ds}}")
+
 
 with DAG(
     dag_id="Daily_Bigquery_Create_Analytics",
