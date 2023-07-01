@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from airflow import DAG
+from airflow.exceptions import AirflowException
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryExecuteQueryOperator,
@@ -60,6 +61,12 @@ excute_sql = """
     LIMIT 10;
     """
 
+
+def on_failure():
+    print("Daily_Bigquery_Create_Analytics 실패! {{ds}}")
+    raise AirflowException("bigquery execute query operator가 작업에 실패했습니다. {{ds}}")
+
+
 with DAG(
     dag_id="Daily_Bigquery_Create_Analytics",
     start_date=datetime(2023, 6, 26),
@@ -86,6 +93,7 @@ with DAG(
         wait_for_completion=False,
         poke_interval=30,
         allowed_states=["success"],
+        on_failure_callback=on_failure,
     )
 
     bigquery_create_analytics_table >> trigger
