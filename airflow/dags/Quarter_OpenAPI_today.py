@@ -73,24 +73,40 @@ def extract_data_OpenAPI(**context):
     MAX_RETRIES = 10
     for _ in range(MAX_RETRIES):
         try:
-            my_response = requests.get(OpenAPI_URL, params=params, timeout=5)
+            res = requests.get(OpenAPI_URL, params=params, timeout=5)
 
-            if "SERVICE_KEY_IS_NOT_REGISTERED_ERROR" in my_response.text:
+            if res.status_code != 200:
+                print(res)
+                raise Exception(
+                    "GCP VM Server requests error, code: " + str(res.status_code)
+                )
+            elif "SERVICE_KEY_IS_NOT_REGISTERED_ERROR" in res.text:
                 raise Exception(
                     "공공데이터 OpenAPI Server error: SERVICE_KEY_IS_NOT_REGISTERED_ERROR"
                 )
             else:
+                res_json = json.loads(res.text)
                 df_today_data = pd.DataFrame(
-                    json.loads(my_response.text)["response"]["body"]["items"]["item"]
+                    res_json["response"]["body"]["items"]["item"]
                 )  # daily data json -> df
                 result_df = pd.concat([result_df, df_today_data], ignore_index=True)
                 print(today_HM, "성공 데이터 :", result_df.shape[0])
                 break
+
+        except TypeError:
+            print(today_HM, "|", "등록된 유기동물 데이터가 없습니다.")
+            break
         except Exception as e:
-            if "item" in e:
-                print(today_HM + "기준", "등록된 유기동물 데이터가 없습니다.")
+            if e.__class__ is requests.exceptions.ReadTimeout:
+                print(today_HM, "|", res.status_code, "ReadTimeout Error : " + str(e))
+            elif e.__class__ is requests.exceptions.ConnectTimeout:
+                print(
+                    today_HM, "|", res.status_code, "ConnectTimeout Error : " + str(e)
+                )
+            else:
+                print(today_HM, "|", res.status_code, e, sep="| ")
+                print("error type :", type(e))
                 break
-            print(today_HM, "등록되지 않은 error :", e)
     else:
         raise AirflowException("10회 이상 추출 실패, OpenAPI 서버 문제로 추출 중단")
 

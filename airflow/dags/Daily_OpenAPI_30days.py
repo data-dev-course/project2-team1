@@ -63,8 +63,17 @@ async def request_OpenAPI(date, params, MAX_RETRIES=10):
                 )  # daily data json -> df
                 print(date, "성공 데이터 :", df_dailydata.shape[0])
                 break
+
+        except TypeError:
+            print(date, "| 등록된 유기동물 데이터가 없습니다.")
+            return None
         except Exception as e:
-            print(date, "error :", e)
+            if e.__class__ is asyncio.exceptions.TimeoutError:
+                print(date, "|", res.status_code, "ReadTimeout Error : " + str(e))
+            elif e.__class__ is asyncio.exceptions.CancelledError:
+                print(date, "|", res.status_code, "CancelledError Error : " + str(e))
+            else:
+                print(date, "|", res.status_code, str(e), "| error type :", type(e))
     else:
         print(date, "10회 이상 추출 실패, OpenAPI 서버 문제로 추출 중단")
         return None
@@ -135,7 +144,7 @@ def extract_data_OpenAPI():
 
     for df_dailydata in results:
         if df_dailydata is None:
-            raise AirflowException("10회 이상 추출 실패 데이터, OpenAPI 서버 문제로 추출 중단")
+            raise AirflowException("10회 이상 추출 실패 데이터 존재 | OpenAPI 서버 문제로 추출 중단")
         else:
             result_df = pd.concat([result_df, df_dailydata], ignore_index=True)
     else:
