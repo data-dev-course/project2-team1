@@ -63,8 +63,17 @@ async def request_OpenAPI(date, params, MAX_RETRIES=10):
                 )  # daily data json -> df
                 print(date, "성공 데이터 :", df_dailydata.shape[0])
                 break
+
+        except TypeError:
+            print(date, "| 등록된 유기동물 데이터가 없습니다.")
+            return None
         except Exception as e:
-            print(date, "error :", e)
+            if e.__class__ is asyncio.exceptions.TimeoutError:
+                print(date, "|", "ReadTimeout Error : " + str(e))
+            elif e.__class__ is asyncio.exceptions.CancelledError:
+                print(date, "|", "CancelledError Error : " + str(e))
+            else:
+                print(date, "|", str(e), "| error type :", type(e))
     else:
         print(date, "10회 이상 추출 실패, OpenAPI 서버 문제로 추출 중단")
         return None
@@ -135,7 +144,7 @@ def extract_data_OpenAPI():
 
     for df_dailydata in results:
         if df_dailydata is None:
-            raise AirflowException("10회 이상 추출 실패 데이터, OpenAPI 서버 문제로 추출 중단")
+            raise AirflowException("10회 이상 추출 실패 데이터 존재 | OpenAPI 서버 문제로 추출 중단")
         else:
             result_df = pd.concat([result_df, df_dailydata], ignore_index=True)
     else:
@@ -184,7 +193,7 @@ def transform_data(**context):
         df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
         # print(df.info())
 
-        TRANSFORM_SAVE_NAME = "transform" + SAVE_NAME
+        TRANSFORM_SAVE_NAME = "transform_" + SAVE_NAME
         TRANSFORM_LOCAL_PATH_NAME = os.path.join(
             os.environ["AIRFLOW_HOME"],
             "data",
@@ -236,7 +245,8 @@ def load_to_bigquery(**context):
     TRANSFORM_SAVE_NAME, TRANSFORM_LOCAL_PATH_NAME = context["ti"].xcom_pull(
         task_ids="transform_data"
     )
-    df = pd.read_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0)
+    date_cols = ['happenDt','noticeSdt','noticeEdt','created_date']
+    df = pd.read_csv(TRANSFORM_LOCAL_PATH_NAME, encoding="utf-8-sig", index_col=0, parse_dates=date_cols)
 
     # 데이터프레임을 로드할 테이블 경로 설정
     table_path = f"{project_id}.{dataset_id}.{table_id}"
