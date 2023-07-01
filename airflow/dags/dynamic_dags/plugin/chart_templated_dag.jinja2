@@ -58,7 +58,7 @@ with DAG(
                 for dic_row in row_data_list:
                     timestamp = dic_row['happenDt'] / 1000
                     date = datetime.datetime.fromtimestamp(timestamp)
-                    dic_row = date.strftime('%Y-%m-%d')
+                    dic_row['happenDt'] = date.strftime('%Y-%m-%d')
                     dic_list.append(dic_row)
             else:
                 dic_list = row_data_list
