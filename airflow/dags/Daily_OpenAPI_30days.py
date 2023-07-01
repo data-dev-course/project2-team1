@@ -69,11 +69,11 @@ async def request_OpenAPI(date, params, MAX_RETRIES=10):
             return None
         except Exception as e:
             if e.__class__ is asyncio.exceptions.TimeoutError:
-                print(date, "|", res.status_code, "ReadTimeout Error : " + str(e))
+                print(date, "|", "ReadTimeout Error : " + str(e))
             elif e.__class__ is asyncio.exceptions.CancelledError:
-                print(date, "|", res.status_code, "CancelledError Error : " + str(e))
+                print(date, "|", "CancelledError Error : " + str(e))
             else:
-                print(date, "|", res.status_code, str(e), "| error type :", type(e))
+                print(date, "|", str(e), "| error type :", type(e))
     else:
         print(date, "10회 이상 추출 실패, OpenAPI 서버 문제로 추출 중단")
         return None
