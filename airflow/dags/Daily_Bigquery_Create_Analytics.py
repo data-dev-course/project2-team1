@@ -74,7 +74,7 @@ with DAG(
     max_active_runs=1,
     schedule_interval=None,
     default_args=default_args,
-    tags=['Bigquery', 'ELT']
+    tags=["Bigquery", "ELT"],
 ) as dag:
     bigquery_create_analytics_table = BigQueryExecuteQueryOperator(
         task_id="excute_query",
