@@ -181,6 +181,7 @@ def transform_data(**context):
         df["noticeEdt"] = pd.to_datetime(df["noticeEdt"], format="%Y%m%d")
         df["noticeSdt"] = pd.to_datetime(df["noticeSdt"], format="%Y%m%d")
         print("data 변환 성공")
+        print(df.info())
 
     else:
         print("변환할 데이터 없음")
@@ -222,7 +223,7 @@ def load_to_bigquery(**context):
     dataset_id = context["params"]["dataset_id"]
     table_id = context["params"]["table_id"]
     df = context["ti"].xcom_pull(task_ids="transform_data")
-
+    print(df.info())
     # BigQuery 클라이언트 인스턴스 생성
     bigquery_client = bigquery.Client()
 
@@ -248,13 +249,17 @@ def load_to_bigquery(**context):
         table_ref = bigquery_client.create_table(
             bigquery.Table(table_path, schema=schema)
         )
-
-        # 데이터프레임을 대상 테이블로 적재
-        job_config = bigquery.LoadJobConfig(schema=bigquery_schema)
-        job = bigquery_client.load_table_from_dataframe(
-            df, table_ref, job_config=job_config
-        )
-        job.result()  # Job 실행 완료 대기
+        # 만약 스크래핑한 데이터가 없을 경우 table에 있는 모든 값 제거 ( 비어있는 테이블 )
+        if len(df) > 0:
+            # 데이터프레임을 대상 테이블로 적재
+            job_config = bigquery.LoadJobConfig(schema=bigquery_schema)
+            job = bigquery_client.load_table_from_dataframe(
+                df, table_ref, job_config=job_config
+            )
+            job.result()  # Job 실행 완료 대기
+            print("quarter data full_refresh 완료")
+        else:
+            print("수집된 데이터가 없습니다")
     except Exception as e:
         print("load_to_bigquery - 오류 발생 : ", e)
         raise AirflowException(f"오류 발생. {e}")
