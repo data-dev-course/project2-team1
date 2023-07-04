@@ -7,12 +7,15 @@ from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryExecuteQueryOperator,
 )
 
+from plugins import slack
+
 default_args = {
     "owner": "ih-tjpark",
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 1,
+    "on_failure_callback": slack.on_failure_callback,
 }
 
 excute_sql = """
