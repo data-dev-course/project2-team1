@@ -8,7 +8,6 @@ from airflow.providers.google.cloud.operators.bigquery import (
 )
 
 
-
 from plugins import slack
 
 default_args = {
