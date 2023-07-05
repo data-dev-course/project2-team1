@@ -7,7 +7,7 @@ on:
       - closed
     branches:
       - 'main'
-      - 'develop'
+      #- 'develop'
     paths:
       - 'airflow/**'
 # GCP 환경설정
